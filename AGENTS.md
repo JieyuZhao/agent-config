@@ -26,6 +26,9 @@ git -C .agent-config/repo sparse-checkout set skills .claude/commands
 if (Test-Path .agent-config/repo/.claude/commands) {
   Copy-Item .agent-config/repo/.claude/commands/*.md .claude/commands/ -Force
 }
+if (-not (Test-Path .gitignore) -or -not (Select-String -Quiet -Pattern '^\\.agent-config/' .gitignore)) {
+  Add-Content -Path .gitignore -Value "`n.agent-config/"
+}
 ```
 
 Bash (macOS/Linux):
@@ -41,6 +44,9 @@ fi
 git -C .agent-config/repo sparse-checkout set skills .claude/commands
 if [ -d .agent-config/repo/.claude/commands ]; then
   cp -f .agent-config/repo/.claude/commands/*.md .claude/commands/
+fi
+if [ ! -f .gitignore ] || ! grep -qx '\.agent-config/' .gitignore; then
+  echo '.agent-config/' >> .gitignore
 fi
 ```
 
