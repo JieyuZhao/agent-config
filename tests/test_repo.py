@@ -105,38 +105,41 @@ class RepoValidationTests(unittest.TestCase):
         commands_dir = project_dir / ".claude" / "commands"
         commands_dir.mkdir(parents=True)
         (commands_dir / "local-only.md").write_text("local-only\n", encoding="utf-8")
-        (commands_dir / "dual-pass-workflow.md").write_text(
-            "stale-pointer\n", encoding="utf-8"
-        )
+        for pointer_file in POINTER_DIR.glob("*.md"):
+            (commands_dir / pointer_file.name).write_text(
+                "stale-pointer\n", encoding="utf-8"
+            )
         (project_dir / ".gitignore").write_text("node_modules/\n", encoding="utf-8")
         return project_dir
 
     def verify_bootstrap_result(self, project_dir: Path) -> None:
         fetched_agents = project_dir / ".agent-config" / "AGENTS.md"
-        cloned_skill = (
-            project_dir
-            / ".agent-config"
-            / "repo"
-            / "skills"
-            / "dual-pass-workflow"
-            / "SKILL.md"
-        )
-        cloned_pointer = (
-            project_dir
-            / ".agent-config"
-            / "repo"
-            / ".claude"
-            / "commands"
-            / "dual-pass-workflow.md"
-        )
-        project_pointer = project_dir / ".claude" / "commands" / "dual-pass-workflow.md"
         local_only_pointer = project_dir / ".claude" / "commands" / "local-only.md"
 
         self.assertTrue(fetched_agents.exists(), "Expected fetched AGENTS.md")
         self.assertIn("## User Profile", read_text(fetched_agents))
-        self.assertTrue(cloned_skill.exists(), "Expected cloned skill definition")
-        self.assertTrue(cloned_pointer.exists(), "Expected cloned Claude pointer")
-        self.assertEqual(read_text(project_pointer), read_text(POINTER_DIR / "dual-pass-workflow.md"))
+        for skill_dir in self.skills:
+            cloned_skill = (
+                project_dir
+                / ".agent-config"
+                / "repo"
+                / "skills"
+                / skill_dir.name
+                / "SKILL.md"
+            )
+            self.assertTrue(cloned_skill.exists(), f"Expected cloned skill: {skill_dir.name}")
+        for pointer_file in POINTER_DIR.glob("*.md"):
+            cloned_pointer = (
+                project_dir
+                / ".agent-config"
+                / "repo"
+                / ".claude"
+                / "commands"
+                / pointer_file.name
+            )
+            project_pointer = project_dir / ".claude" / "commands" / pointer_file.name
+            self.assertTrue(cloned_pointer.exists(), f"Expected cloned pointer: {pointer_file.name}")
+            self.assertEqual(read_text(project_pointer), read_text(pointer_file))
         self.assertEqual(read_text(local_only_pointer), "local-only\n")
 
         gitignore_lines = (project_dir / ".gitignore").read_text(
@@ -245,6 +248,11 @@ class RepoValidationTests(unittest.TestCase):
             self.assertTrue((skill_dir / "SKILL.md").exists(), skill_name)
             self.assertTrue((skill_dir / "agents" / "openai.yaml").exists(), skill_name)
             self.assertTrue((POINTER_DIR / f"{skill_name}.md").exists(), skill_name)
+
+    def test_bibref_filler_has_working_bib_template(self) -> None:
+        self.assertTrue(
+            (SKILLS_DIR / "bibref-filler" / "assets" / "working.bib").exists()
+        )
 
     def test_pointer_files_match_skill_directories(self) -> None:
         skill_names = {path.name for path in self.skills}

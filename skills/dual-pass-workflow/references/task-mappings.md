@@ -152,7 +152,7 @@ Skill roles:
 - primary example: `nsf-proposal-composer`
 - compliance example: `nsf-proposal-guardrail`
 - refinement example: `nsf-thrust-refiner`
-- citation example: `nsf-bibref-filler`
+- citation example: `bibref-filler`
 
 Protected regions:
 
@@ -263,28 +263,52 @@ Suggested asks:
 
 Common examples:
 
-- `nsf-bibref-filler`
+- `bibref-filler`
 
 Primary result:
 
-- Patched `.tex` files with verified citations
-- Updated `working.bib` with machine-added entries
+- Patched source files with verified citations
+- Dedicated `working.bib` or equivalent placed next to the active main bib
+  files and containing all machine-added entries
+
+Primary use case:
+
+- Safe addition of new external papers, not merely reuse of already-local cite
+  keys
 
 Verification:
 
-- `check_cite_keys.py` on all touched `.tex` files
-- Factual support check: each inserted cite key's paper must actually support the sentence it is attached to, not just topic-match
+- Citation-key validation on all touched source files against the curated bibs
+  plus the dedicated working bib
+- Storage check: every machine-added entry lives in the dedicated working bib,
+  not in the curated main bib files
+- Existence and metadata check: each inserted citation refers to a real paper
+  with exact canonical metadata; full text is not required for this check
+- Conservative fit check: when support was judged without full text, the cited
+  paper must still be a conservative fit based on metadata, abstract, or a
+  canonical summary page
+- Capability check: if the current agent lacked reliable external lookup, the
+  run must fall back to audit or TODO mode rather than fabricating new entries
 
 Audit emphasis:
 
-- `factual_or_behavior_issue`: cite key exists in bib but the referenced paper does not support the claim
+- `factual_or_behavior_issue`: invented or unverifiable paper metadata, or a
+  citation that exists in the bib files but does not support the claim
 - `unsupported_claim_or_assumption`: topic-match used as support, self-citation cluster used for field-wide claims
-- `missed_requirement`: visible `\todo{}` not left where uncertainty remains, `working.bib` not updated
+- `missed_requirement`: visible unresolved note not left where uncertainty
+  remains, or machine-added entries not isolated in the dedicated working bib
 - `clarity_or_structure_issue`: citation dumps, inconsistent density across sections
 
 When to use dual-pass:
 
-- Second-pass is especially valuable here because first-pass citation placement carries the highest hallucination risk among the core skills. The second-pass should independently verify that each inserted citation actually supports its claim, not just that the key resolves.
+- Second-pass is especially valuable here because first-pass citation placement
+  carries a high hallucination risk. The second-pass should independently
+  verify two things: no inserted citation points to a nonexistent paper, and
+  every machine-added entry is isolated in the dedicated working bib next to
+  the main bib files. This is especially important when the first pass added
+  new external entries rather than only reusing local ones. The second pass
+  does not need full-text access to check existence if canonical metadata is
+  exact.
 
 Suggested asks:
 

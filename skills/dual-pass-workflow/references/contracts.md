@@ -67,7 +67,7 @@ verification: []
 #   primary: "nsf-proposal-composer"
 #   compliance: "nsf-proposal-guardrail"
 #   refinement: "nsf-thrust-refiner"
-#   citation: "nsf-bibref-filler"
+#   citation: "<citation-skill>"
 
 # Optional: paths that must exist before first-pass.
 # workspace_contract:
@@ -151,7 +151,7 @@ skill_roles:
   primary: "nsf-proposal-composer"
   compliance: "nsf-proposal-guardrail"
   refinement: "nsf-thrust-refiner"
-  citation: "nsf-bibref-filler"
+  citation: "<citation-skill>"
 ```
 
 The `primary` role is the main domain skill. Other roles are consulted by the primary skill at defined escalation points. The dual-pass workflow does not orchestrate inter-skill calls; it records which skill fills which role so the second-pass agent understands the coordination structure.

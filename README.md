@@ -7,7 +7,7 @@ Personal shared configuration for Codex and Claude Code. Not intended for genera
 Other project repos bootstrap from this repo to get shared agent defaults and skills. The bootstrap script (defined in `AGENTS.md`) fetches:
 
 - **`AGENTS.md`** — user profile, writing/formatting defaults, environment notes, skill-sharing rules
-- **`skills/`** — shared skills (e.g., `dual-pass-workflow`)
+- **`skills/`** — shared skills (e.g., `dual-pass-workflow`, `bibref-filler`)
 - **`.claude/commands/`** — Claude Code pointer commands for shared skills
 
 ## Adding to a Project
@@ -49,12 +49,22 @@ GitHub Actions runs the same test suite on Ubuntu and Windows for every push and
 | Skill | Description |
 |-------|-------------|
 | `dual-pass-workflow` | Outer shell for two-pass tasks: first pass builds the artifact, optional second pass audits and reconciles. Works with any domain skill (paper review, bug fix, writing, frontend edit, etc.). |
+| `bibref-filler` | Add new external verified citations while keeping curated bibliography files stable, placing machine-added entries in a separate `working.bib`, and leaving visible unresolved notes instead of guessing. |
 
 ## Structure
 
 ```
 AGENTS.md                          # Shared agent config (entry point)
 skills/
+  bibref-filler/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    assets/
+      working.bib                 # Starter template for machine-added entries
+    references/
+      citation-rules.md            # Density, placement, and storage guidance
+    scripts/
+      check_cite_keys.py           # Local cite-key validation helper
   dual-pass-workflow/
     SKILL.md                       # Skill definition (single source of truth)
     agents/openai.yaml             # Codex wrapper
@@ -65,5 +75,6 @@ skills/
       workflow.yaml                # Task packet template
       handoff.md, audit.md, reconcile.md  # Workflow note templates
 .claude/commands/
+  bibref-filler.md                 # Claude Code pointer to SKILL.md
   dual-pass-workflow.md            # Claude Code pointer to SKILL.md
 ```
