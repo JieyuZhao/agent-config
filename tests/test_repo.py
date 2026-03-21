@@ -16,6 +16,7 @@ GITATTRIBUTES = ROOT / ".gitattributes"
 WORKFLOW = ROOT / ".github" / "workflows" / "validate.yml"
 SKILLS_DIR = ROOT / "skills"
 POINTER_DIR = ROOT / ".claude" / "commands"
+BOOTSTRAP_DIR = ROOT / "bootstrap"
 
 
 def read_text(path: Path) -> str:
@@ -51,6 +52,8 @@ class RepoValidationTests(unittest.TestCase):
         cls.gitignore_text = read_text(GITIGNORE)
         cls.gitattributes_text = read_text(GITATTRIBUTES)
         cls.workflow_text = read_text(WORKFLOW)
+        cls.bootstrap_powershell_text = read_text(BOOTSTRAP_DIR / "bootstrap.ps1")
+        cls.bootstrap_bash_text = read_text(BOOTSTRAP_DIR / "bootstrap.sh")
         cls.skills = skill_dirs()
         cls.powershell_bootstrap = extract_fenced_block(cls.agents_text, "powershell")
         cls.bash_bootstrap = extract_fenced_block(cls.agents_text, "bash")
@@ -74,8 +77,10 @@ class RepoValidationTests(unittest.TestCase):
         remote_dir = base_dir / "remote-src"
         remote_dir.mkdir()
         shutil.copy2(AGENTS, remote_dir / "AGENTS.md")
+        shutil.copytree(BOOTSTRAP_DIR, remote_dir / "bootstrap")
         shutil.copytree(SKILLS_DIR, remote_dir / "skills")
         shutil.copytree(POINTER_DIR, remote_dir / ".claude" / "commands")
+        self.localize_remote_bootstrap_scripts(remote_dir)
 
         init = run_command(["git", "init"], remote_dir)
         self.assert_command_ok(init, "git init in remote snapshot")
@@ -100,6 +105,34 @@ class RepoValidationTests(unittest.TestCase):
         self.assert_command_ok(commit, "git commit in remote snapshot")
         return remote_dir
 
+    def localize_remote_bootstrap_scripts(self, remote_dir: Path) -> None:
+        agents_copy = str((remote_dir / "AGENTS.md")).replace("'", "''")
+        remote_uri = remote_dir.as_uri()
+
+        powershell_script = remote_dir / "bootstrap" / "bootstrap.ps1"
+        powershell_text = read_text(powershell_script).replace(
+            "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md",
+            f"Copy-Item -LiteralPath '{agents_copy}' -Destination .agent-config/AGENTS.md",
+        )
+        powershell_script.write_text(
+            powershell_text.replace(
+                "https://github.com/yzhao062/agent-config.git", remote_uri
+            ),
+            encoding="utf-8",
+        )
+
+        bash_script = remote_dir / "bootstrap" / "bootstrap.sh"
+        bash_text = read_text(bash_script).replace(
+            "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md",
+            f"cp {shlex.quote((remote_dir / 'AGENTS.md').as_posix())} .agent-config/AGENTS.md",
+        )
+        bash_script.write_text(
+            bash_text.replace(
+                "https://github.com/yzhao062/agent-config.git", remote_uri
+            ),
+            encoding="utf-8",
+        )
+
     def prepare_project_dir(self, base_dir: Path) -> Path:
         project_dir = base_dir / "project"
         commands_dir = project_dir / ".claude" / "commands"
@@ -109,6 +142,8 @@ class RepoValidationTests(unittest.TestCase):
             (commands_dir / pointer_file.name).write_text(
                 "stale-pointer\n", encoding="utf-8"
             )
+        (project_dir / "AGENTS.md").write_text("stale-root-agents\n", encoding="utf-8")
+        (project_dir / "AGENTS.local.md").write_text("## Local Rules\n- keep me\n", encoding="utf-8")
         (project_dir / ".gitignore").write_text("node_modules/\n", encoding="utf-8")
         return project_dir
 
@@ -118,6 +153,8 @@ class RepoValidationTests(unittest.TestCase):
 
         self.assertTrue(fetched_agents.exists(), "Expected fetched AGENTS.md")
         self.assertIn("## User Profile", read_text(fetched_agents))
+        self.assertEqual(read_text(project_dir / "AGENTS.md"), read_text(AGENTS))
+        self.assertEqual(read_text(project_dir / "AGENTS.local.md"), "## Local Rules\n- keep me\n")
         for skill_dir in self.skills:
             cloned_skill = (
                 project_dir
@@ -148,23 +185,17 @@ class RepoValidationTests(unittest.TestCase):
         self.assertEqual(gitignore_lines.count(".agent-config/"), 1)
 
     def render_powershell_smoke_script(self, remote_dir: Path) -> str:
-        agents_copy = str((remote_dir / "AGENTS.md")).replace("'", "''")
-        script = self.powershell_bootstrap.replace(
-            "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md",
-            f"Copy-Item -LiteralPath '{agents_copy}' -Destination .agent-config/AGENTS.md",
-        )
-        return script.replace(
-            "https://github.com/yzhao062/agent-config.git", remote_dir.as_uri()
+        bootstrap_copy = str((remote_dir / "bootstrap" / "bootstrap.ps1")).replace("'", "''")
+        return self.powershell_bootstrap.replace(
+            "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.ps1 -OutFile .agent-config/bootstrap.ps1",
+            f"Copy-Item -LiteralPath '{bootstrap_copy}' -Destination .agent-config/bootstrap.ps1",
         )
 
     def render_bash_smoke_script(self, remote_dir: Path) -> str:
-        agents_copy = shlex.quote((remote_dir / "AGENTS.md").as_posix())
-        script = self.bash_bootstrap.replace(
-            "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md",
-            f"cp {agents_copy} .agent-config/AGENTS.md",
-        )
-        return script.replace(
-            "https://github.com/yzhao062/agent-config.git", remote_dir.as_uri()
+        bootstrap_copy = shlex.quote((remote_dir / "bootstrap" / "bootstrap.sh").as_posix())
+        return self.bash_bootstrap.replace(
+            "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh",
+            f"cp {bootstrap_copy} .agent-config/bootstrap.sh",
         )
 
     def test_repo_has_at_least_one_skill(self) -> None:
@@ -184,18 +215,35 @@ class RepoValidationTests(unittest.TestCase):
         required_fragments = [
             "PowerShell (Windows):",
             "```powershell",
-            "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md",
-            "Copy-Item .agent-config/repo/.claude/commands/*.md .claude/commands/ -Force",
-            "Add-Content -Path .gitignore -Value \"`n.agent-config/\"",
+            "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.ps1 -OutFile .agent-config/bootstrap.ps1",
+            "& .\\.agent-config\\bootstrap.ps1",
             "Bash (macOS/Linux):",
             "```bash",
-            "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md",
-            "cp -f .agent-config/repo/.claude/commands/*.md .claude/commands/",
-            "echo '.agent-config/' >> .gitignore",
-            "git -C .agent-config/repo sparse-checkout set skills .claude/commands",
+            "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh",
+            "bash .agent-config/bootstrap.sh",
+            "root `AGENTS.md` to match the shared copy",
+            "AGENTS.local.md",
         ]
         for fragment in required_fragments:
             self.assertIn(fragment, self.agents_text)
+
+    def test_bootstrap_scripts_cover_sync_steps(self) -> None:
+        required_fragments = [
+            "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md",
+            "Copy-Item .agent-config/AGENTS.md AGENTS.md -Force",
+            "git clone --depth 1 --filter=blob:none --sparse https://github.com/yzhao062/agent-config.git .agent-config/repo",
+            "git -C .agent-config/repo sparse-checkout set skills .claude/commands",
+            "Copy-Item .agent-config/repo/.claude/commands/*.md .claude/commands/ -Force",
+            "Add-Content -Path .gitignore -Value \"`n.agent-config/\"",
+            "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md",
+            "cp -f .agent-config/AGENTS.md AGENTS.md",
+            "cp -f .agent-config/repo/.claude/commands/*.md .claude/commands/",
+            "git -C .agent-config/repo sparse-checkout set skills .claude/commands",
+            "echo '.agent-config/' >> .gitignore",
+        ]
+        bootstrap_text = self.bootstrap_powershell_text + "\n" + self.bootstrap_bash_text
+        for fragment in required_fragments:
+            self.assertIn(fragment, bootstrap_text)
 
     def test_agents_declares_non_destructive_claude_sync(self) -> None:
         self.assertIn(

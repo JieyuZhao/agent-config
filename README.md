@@ -19,6 +19,11 @@ Paste the bootstrap block from `AGENTS.md` into the top of your project's `AGENT
 3. Copy shared commands into the project's `.claude/commands/` (non-destructive).
 4. Auto-add `.agent-config/` to the project's `.gitignore`.
 
+The copied block downloads the latest shared `bootstrap.ps1` or `bootstrap.sh`
+at runtime. Those scripts refresh the consuming repo's root `AGENTS.md` to
+match the shared copy. If a project later needs local overrides, put them in
+`AGENTS.local.md`.
+
 ## Quick Start Prompt
 
 After pasting the bootstrap block into the project's `AGENTS.md`, tell the agent:
@@ -55,6 +60,9 @@ GitHub Actions runs the same test suite on Ubuntu and Windows for every push and
 
 ```
 AGENTS.md                          # Shared agent config (entry point)
+bootstrap/
+  bootstrap.ps1                   # Windows bootstrap logic
+  bootstrap.sh                    # Unix bootstrap logic
 skills/
   bibref-filler/
     SKILL.md                       # Skill definition

@@ -19,39 +19,19 @@ PowerShell (Windows):
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .agent-config, .claude, .claude/commands | Out-Null
-Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md
-if (Test-Path .agent-config/repo/.git) {
-  git -C .agent-config/repo pull --ff-only
-} else {
-  git clone --depth 1 --filter=blob:none --sparse https://github.com/yzhao062/agent-config.git .agent-config/repo
-}
-git -C .agent-config/repo sparse-checkout set skills .claude/commands
-if (Test-Path .agent-config/repo/.claude/commands) {
-  Copy-Item .agent-config/repo/.claude/commands/*.md .claude/commands/ -Force
-}
-if (-not (Test-Path .gitignore) -or -not (Select-String -Quiet -Pattern '^\.agent-config/' .gitignore)) {
-  Add-Content -Path .gitignore -Value "`n.agent-config/"
-}
+Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.ps1 -OutFile .agent-config/bootstrap.ps1
+& .\.agent-config\bootstrap.ps1
 ```
 
 Bash (macOS/Linux):
 
 ```bash
 mkdir -p .agent-config .claude/commands
-curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md
-if [ -d .agent-config/repo/.git ]; then
-  git -C .agent-config/repo pull --ff-only
-else
-  git clone --depth 1 --filter=blob:none --sparse https://github.com/yzhao062/agent-config.git .agent-config/repo
-fi
-git -C .agent-config/repo sparse-checkout set skills .claude/commands
-if [ -d .agent-config/repo/.claude/commands ]; then
-  cp -f .agent-config/repo/.claude/commands/*.md .claude/commands/
-fi
-if [ ! -f .gitignore ] || ! grep -qx '\.agent-config/' .gitignore; then
-  echo '.agent-config/' >> .gitignore
-fi
+curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh
+bash .agent-config/bootstrap.sh
 ```
+
+This bootstrap flow refreshes the consuming repo's root `AGENTS.md` to match the shared copy. If a project later needs repo-local overrides, put them in `AGENTS.local.md`.
 
 Read and follow the rules in `.agent-config/AGENTS.md` as baseline defaults. Any rule defined later in this file overrides the shared default.
 When a skill is invoked, read its SKILL.md from `.agent-config/repo/skills/<skill-name>/SKILL.md`.
@@ -70,6 +50,7 @@ Add `.agent-config/` to the project's `.gitignore` so fetched files are not comm
 
 ### Override rules
 
+- If `AGENTS.local.md` exists in the project root, read and follow it after `AGENTS.md`. Rules in `AGENTS.local.md` override the shared defaults.
 - Project-local `AGENTS.md` rules always win over shared defaults.
 - Project-local `skills/<name>/SKILL.md` always wins over the shared copy of the same skill.
 - If a shared skill does not exist locally, the agent should use the fetched copy from `.agent-config/repo/skills/`.
