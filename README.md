@@ -9,15 +9,17 @@ Other project repos bootstrap from this repo to get shared agent defaults and sk
 - **`AGENTS.md`** — user profile, writing/formatting defaults, environment notes, skill-sharing rules
 - **`skills/`** — shared skills (e.g., `dual-pass-workflow`, `bibref-filler`)
 - **`.claude/commands/`** — Claude Code pointer commands for shared skills
+- **`.claude/settings.json`** — shared Claude project defaults such as `effortLevel: high`
 
 ## Adding to a Project
 
 Paste the bootstrap block from `AGENTS.md` into the top of your project's `AGENTS.md`. The script will:
 
 1. Download the latest `AGENTS.md` into `.agent-config/`.
-2. Sparse-clone `skills/` and `.claude/commands/` into `.agent-config/repo/`.
+2. Sparse-clone `skills/` and the shared `.claude/` files into `.agent-config/repo/`.
 3. Copy shared commands into the project's `.claude/commands/` (non-destructive).
-4. Auto-add `.agent-config/` to the project's `.gitignore`.
+4. Merge shared keys into the project's `.claude/settings.json` on every run; project-only keys are preserved.
+5. Auto-add `.agent-config/` to the project's `.gitignore`.
 
 The copied block downloads the latest shared `bootstrap.ps1` or `bootstrap.sh`
 at runtime. Those scripts refresh the consuming repo's root `AGENTS.md` to
@@ -125,4 +127,5 @@ skills/
   bibref-filler.md                 # Claude Code pointer to SKILL.md
   figure-prompt-builder.md         # Claude Code pointer to SKILL.md
   dual-pass-workflow.md            # Claude Code pointer to SKILL.md
+.claude/settings.json              # Shared Claude project defaults (e.g., effortLevel)
 ```

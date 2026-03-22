@@ -6,6 +6,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+import json
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -16,6 +17,7 @@ GITATTRIBUTES = ROOT / ".gitattributes"
 WORKFLOW = ROOT / ".github" / "workflows" / "validate.yml"
 SKILLS_DIR = ROOT / "skills"
 POINTER_DIR = ROOT / ".claude" / "commands"
+CLAUDE_SETTINGS = ROOT / ".claude" / "settings.json"
 BOOTSTRAP_DIR = ROOT / "bootstrap"
 
 
@@ -80,6 +82,7 @@ class RepoValidationTests(unittest.TestCase):
         shutil.copytree(BOOTSTRAP_DIR, remote_dir / "bootstrap")
         shutil.copytree(SKILLS_DIR, remote_dir / "skills")
         shutil.copytree(POINTER_DIR, remote_dir / ".claude" / "commands")
+        shutil.copy2(CLAUDE_SETTINGS, remote_dir / ".claude" / "settings.json")
         self.localize_remote_bootstrap_scripts(remote_dir)
 
         init = run_command(["git", "init"], remote_dir)
@@ -150,6 +153,7 @@ class RepoValidationTests(unittest.TestCase):
     def verify_bootstrap_result(self, project_dir: Path) -> None:
         fetched_agents = project_dir / ".agent-config" / "AGENTS.md"
         local_only_pointer = project_dir / ".claude" / "commands" / "local-only.md"
+        project_settings = project_dir / ".claude" / "settings.json"
 
         self.assertTrue(fetched_agents.exists(), "Expected fetched AGENTS.md")
         self.assertIn("## User Profile", read_text(fetched_agents))
@@ -178,6 +182,15 @@ class RepoValidationTests(unittest.TestCase):
             self.assertTrue(cloned_pointer.exists(), f"Expected cloned pointer: {pointer_file.name}")
             self.assertEqual(read_text(project_pointer), read_text(pointer_file))
         self.assertEqual(read_text(local_only_pointer), "local-only\n")
+        self.assertTrue(project_settings.exists(), "Expected Claude settings")
+        project_data = json.loads(read_text(project_settings))
+        shared_data = json.loads(read_text(CLAUDE_SETTINGS))
+        for key, value in shared_data.items():
+            self.assertEqual(project_data.get(key), value, f"shared key '{key}'")
+        self.assertEqual(
+            project_data.get("projectOnlyKey"), "keep-me",
+            "project-only key should survive merge",
+        )
 
         gitignore_lines = (project_dir / ".gitignore").read_text(
             encoding="utf-8"
@@ -223,6 +236,8 @@ class RepoValidationTests(unittest.TestCase):
             "bash .agent-config/bootstrap.sh",
             "root `AGENTS.md` to match the shared copy",
             "AGENTS.local.md",
+            ".claude/settings.json",
+            "effortLevel",
         ]
         for fragment in required_fragments:
             self.assertIn(fragment, self.agents_text)
@@ -232,13 +247,18 @@ class RepoValidationTests(unittest.TestCase):
             "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md",
             "Copy-Item .agent-config/AGENTS.md AGENTS.md -Force",
             "git clone --depth 1 --filter=blob:none --sparse https://github.com/yzhao062/agent-config.git .agent-config/repo",
-            "git -C .agent-config/repo sparse-checkout set skills .claude/commands",
+            "git -C .agent-config/repo sparse-checkout set skills .claude",
             "Copy-Item .agent-config/repo/.claude/commands/*.md .claude/commands/ -Force",
+            "Copy-Item .agent-config/repo/.claude/settings.json .claude/settings.json -Force",
+            "ConvertFrom-Json",
+            "Add-Member",
             "Add-Content -Path .gitignore -Value \"`n.agent-config/\"",
             "curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md",
             "cp -f .agent-config/AGENTS.md AGENTS.md",
             "cp -f .agent-config/repo/.claude/commands/*.md .claude/commands/",
-            "git -C .agent-config/repo sparse-checkout set skills .claude/commands",
+            "cp -f .agent-config/repo/.claude/settings.json .claude/settings.json",
+            ".update(s)",
+            "git -C .agent-config/repo sparse-checkout set skills .claude",
             "echo '.agent-config/' >> .gitignore",
         ]
         bootstrap_text = self.bootstrap_powershell_text + "\n" + self.bootstrap_bash_text
@@ -277,7 +297,9 @@ class RepoValidationTests(unittest.TestCase):
             "**`AGENTS.md`**",
             "**`skills/`**",
             "**`.claude/commands/`**",
+            "**`.claude/settings.json`**",
             "Auto-add `.agent-config/` to the project's `.gitignore`.",
+            "Merge shared keys into the project's `.claude/settings.json`",
             "阅读 AGENTS.md 并执行其中的 bootstrap 脚本。",
             "Use any Python 3.12 interpreter to run them locally:",
             "temp-project smoke tests for the bootstrap flow",
@@ -296,6 +318,12 @@ class RepoValidationTests(unittest.TestCase):
             self.assertTrue((skill_dir / "SKILL.md").exists(), skill_name)
             self.assertTrue((skill_dir / "agents" / "openai.yaml").exists(), skill_name)
             self.assertTrue((POINTER_DIR / f"{skill_name}.md").exists(), skill_name)
+
+    def test_shared_claude_settings_file_is_tracked_and_sets_high_effort(self) -> None:
+        tracked = self.tracked_files()
+        self.assertIn(".claude/settings.json", tracked)
+        settings = json.loads(read_text(CLAUDE_SETTINGS))
+        self.assertEqual(settings.get("effortLevel"), "high")
 
     def test_skill_core_files_are_tracked(self) -> None:
         tracked = self.tracked_files()
@@ -395,6 +423,12 @@ class RepoValidationTests(unittest.TestCase):
             )
             self.assert_command_ok(first_run, "first PowerShell bootstrap run")
 
+            # Inject a project-only key to verify merge preserves it
+            ps = project_dir / ".claude" / "settings.json"
+            data = json.loads(read_text(ps))
+            data["projectOnlyKey"] = "keep-me"
+            ps.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
+
             second_run = run_command(
                 [shell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", script],
                 project_dir,
@@ -417,6 +451,12 @@ class RepoValidationTests(unittest.TestCase):
 
             first_run = run_command([shell, "-lc", script], project_dir)
             self.assert_command_ok(first_run, "first bash bootstrap run")
+
+            # Inject a project-only key to verify merge preserves it
+            ps = project_dir / ".claude" / "settings.json"
+            data = json.loads(read_text(ps))
+            data["projectOnlyKey"] = "keep-me"
+            ps.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
             second_run = run_command([shell, "-lc", script], project_dir)
             self.assert_command_ok(second_run, "second bash bootstrap run")
