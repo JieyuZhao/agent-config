@@ -9,7 +9,7 @@ Other project repos bootstrap from this repo to get shared agent defaults and sk
 - **`AGENTS.md`** — user profile, writing/formatting defaults, environment notes, skill-sharing rules
 - **`skills/`** — shared skills (e.g., `dual-pass-workflow`, `bibref-filler`)
 - **`.claude/commands/`** — Claude Code pointer commands for shared skills
-- **`.claude/settings.json`** — shared Claude project defaults such as `effortLevel: high`
+- **`.claude/settings.json`** — shared Claude project defaults (`effortLevel: high`, permissions, etc.)
 
 ## Adding to a Project
 
@@ -127,5 +127,5 @@ skills/
   bibref-filler.md                 # Claude Code pointer to SKILL.md
   figure-prompt-builder.md         # Claude Code pointer to SKILL.md
   dual-pass-workflow.md            # Claude Code pointer to SKILL.md
-.claude/settings.json              # Shared Claude project defaults (e.g., effortLevel)
+.claude/settings.json              # Shared Claude project defaults (effortLevel, permissions, etc.)
 ```

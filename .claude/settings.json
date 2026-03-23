@@ -12,7 +12,19 @@
       "Edit",
       "Write",
       "Read",
-      "Skill"
+      "Skill",
+      "WebFetch",
+      "WebSearch",
+      "Bash(pip:*)",
+      "Bash(pytest:*)",
+      "Bash(conda:*)",
+      "Bash(mamba:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(mv:*)",
+      "Bash(cat:*)",
+      "Bash(curl:*)",
+      "Bash(echo:*)"
     ]
   }
 }
