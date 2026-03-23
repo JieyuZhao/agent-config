@@ -12,6 +12,8 @@
       "Edit",
       "Write",
       "Read",
+      "Grep",
+      "Glob",
       "Skill",
       "WebFetch",
       "WebSearch",
