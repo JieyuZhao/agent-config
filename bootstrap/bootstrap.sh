@@ -16,9 +16,14 @@ if [ -f .agent-config/repo/.claude/settings.json ]; then
     if [ -n "$_py" ]; then
       "$_py" -c "
 import json, pathlib as P
+def dm(b,o):
+ for k,v in o.items():
+  if k in b and isinstance(b[k],dict) and isinstance(v,dict):dm(b[k],v)
+  elif k in b and isinstance(b[k],list) and isinstance(v,list):b[k]=list(dict.fromkeys(b[k]+v))
+  else:b[k]=v
 s=json.loads(P.Path('.agent-config/repo/.claude/settings.json').read_text())
 p=json.loads(P.Path('.claude/settings.json').read_text())
-p.update(s)
+dm(p,s)
 P.Path('.claude/settings.json').write_text(json.dumps(p,indent=2)+'\n')
 "
     fi

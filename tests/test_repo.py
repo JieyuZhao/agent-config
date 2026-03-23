@@ -186,10 +186,24 @@ class RepoValidationTests(unittest.TestCase):
         project_data = json.loads(read_text(project_settings))
         shared_data = json.loads(read_text(CLAUDE_SETTINGS))
         for key, value in shared_data.items():
-            self.assertEqual(project_data.get(key), value, f"shared key '{key}'")
+            if isinstance(value, dict):
+                for sk, sv in value.items():
+                    self.assertIn(sk, project_data.get(key, {}), f"shared nested key '{key}.{sk}'")
+                    if isinstance(sv, list):
+                        for item in sv:
+                            self.assertIn(item, project_data[key][sk], f"shared list item '{item}' in '{key}.{sk}'")
+                    else:
+                        self.assertEqual(project_data[key][sk], sv, f"shared key '{key}.{sk}'")
+            else:
+                self.assertEqual(project_data.get(key), value, f"shared key '{key}'")
         self.assertEqual(
             project_data.get("projectOnlyKey"), "keep-me",
             "project-only key should survive merge",
+        )
+        self.assertIn(
+            "Bash(project-only:*)",
+            project_data.get("permissions", {}).get("allow", []),
+            "project-only permission should survive deep merge",
         )
 
         gitignore_lines = (project_dir / ".gitignore").read_text(
@@ -257,7 +271,8 @@ class RepoValidationTests(unittest.TestCase):
             "cp -f .agent-config/AGENTS.md AGENTS.md",
             "cp -f .agent-config/repo/.claude/commands/*.md .claude/commands/",
             "cp -f .agent-config/repo/.claude/settings.json .claude/settings.json",
-            ".update(s)",
+            "dict.fromkeys",
+            "Merge-Json",
             "git -C .agent-config/repo sparse-checkout set skills .claude",
             "echo '.agent-config/' >> .gitignore",
         ]
@@ -423,10 +438,11 @@ class RepoValidationTests(unittest.TestCase):
             )
             self.assert_command_ok(first_run, "first PowerShell bootstrap run")
 
-            # Inject a project-only key to verify merge preserves it
+            # Inject project-only keys to verify deep merge preserves them
             ps = project_dir / ".claude" / "settings.json"
             data = json.loads(read_text(ps))
             data["projectOnlyKey"] = "keep-me"
+            data.setdefault("permissions", {}).setdefault("allow", []).append("Bash(project-only:*)")
             ps.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
             second_run = run_command(
@@ -452,10 +468,11 @@ class RepoValidationTests(unittest.TestCase):
             first_run = run_command([shell, "-lc", script], project_dir)
             self.assert_command_ok(first_run, "first bash bootstrap run")
 
-            # Inject a project-only key to verify merge preserves it
+            # Inject project-only keys to verify deep merge preserves them
             ps = project_dir / ".claude" / "settings.json"
             data = json.loads(read_text(ps))
             data["projectOnlyKey"] = "keep-me"
+            data.setdefault("permissions", {}).setdefault("allow", []).append("Bash(project-only:*)")
             ps.write_text(json.dumps(data, indent=2) + "\n", encoding="utf-8")
 
             second_run = run_command([shell, "-lc", script], project_dir)

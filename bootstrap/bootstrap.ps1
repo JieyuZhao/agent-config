@@ -12,11 +12,24 @@ if (Test-Path .agent-config/repo/.claude/commands) {
 }
 if (Test-Path .agent-config/repo/.claude/settings.json) {
   if (Test-Path .claude/settings.json) {
+    function Merge-Json($base, $over) {
+      foreach ($p in $over.PSObject.Properties) {
+        $b = $base.PSObject.Properties[$p.Name]
+        if ($b -and $b.Value -is [PSCustomObject] -and $p.Value -is [PSCustomObject]) {
+          Merge-Json $b.Value $p.Value
+        } elseif ($b -and $b.Value -is [Array] -and $p.Value -is [Array]) {
+          $s = [System.Collections.Generic.HashSet[string]]::new()
+          $m = @(); foreach ($i in $b.Value) { if ($s.Add($i)) { $m += $i } }
+          foreach ($i in $p.Value) { if ($s.Add($i)) { $m += $i } }
+          $base | Add-Member -NotePropertyName $p.Name -NotePropertyValue $m -Force
+        } else {
+          $base | Add-Member -NotePropertyName $p.Name -NotePropertyValue $p.Value -Force
+        }
+      }
+    }
     $shared = Get-Content .agent-config/repo/.claude/settings.json -Raw | ConvertFrom-Json
     $project = Get-Content .claude/settings.json -Raw | ConvertFrom-Json
-    foreach ($prop in $shared.PSObject.Properties) {
-      $project | Add-Member -NotePropertyName $prop.Name -NotePropertyValue $prop.Value -Force
-    }
+    Merge-Json $project $shared
     $project | ConvertTo-Json -Depth 10 | Set-Content .claude/settings.json
   } else {
     Copy-Item .agent-config/repo/.claude/settings.json .claude/settings.json -Force
