@@ -202,6 +202,10 @@ Prefer prompts that tell the rendering model:
 Do not ask the rendering model to optimize for the repo's internal workflow.
 That part belongs in the local brief, not in the copied prompt.
 
+Never ask an outside image model to produce code-based formats such as TikZ,
+SVG, Graphviz, or Mermaid. These formats severely limit visual quality. When a
+code-based source is needed, the agent should write it directly.
+
 ### 7. Support Third-Party Tools Without Depending On Them
 
 When the user wants to use Gemini, Sora, Midjourney, Flux, or similar tools:

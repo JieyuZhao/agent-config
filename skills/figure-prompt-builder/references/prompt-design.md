@@ -10,6 +10,15 @@ the repo's internal workflow.
 
 Keep internal planning separate from the pasted prompt.
 
+## Format Restriction For External Prompts
+
+Never ask an outside image model to produce code-based output formats such as
+TikZ, SVG, Graphviz, or Mermaid. These formats drastically limit the visual
+quality and richness the model can deliver. External image models should always
+produce raster or rendered visual output. When a code-based editable source is
+needed, the agent should write it directly rather than prompting an external
+model for it.
+
 ## What A Good Cross-Model Prompt Should Do
 
 A strong prompt for a research or technical figure should:

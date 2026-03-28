@@ -43,6 +43,11 @@ Do not include repo-only instructions such as:
 - file naming conventions
 - notes to future collaborators
 
+Do not ask the outside model to produce code-based output formats such as TikZ,
+SVG, Graphviz, or Mermaid. These formats severely limit the visual richness that
+image models can deliver. When the agent needs a code-based figure, it should
+write the code itself rather than prompting an external model for it.
+
 ## Visual-Quality Layer
 
 When the user wants the figure to look polished, the prompt should say some
