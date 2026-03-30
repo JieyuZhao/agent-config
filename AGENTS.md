@@ -46,7 +46,7 @@ Add `.agent-config/` to the project's `.gitignore` so fetched files are not comm
 | Content | Source | How fetched |
 |---------|--------|-------------|
 | User profile, writing defaults, formatting rules, environment notes | `AGENTS.md` (this file) | `curl` raw file |
-| Shared skills (`dual-pass-workflow`, etc.) | `skills/` directory (committed only) | sparse `git clone` |
+| Shared skills (`dual-pass-workflow`, `bibref-filler`, `figure-prompt-builder`, etc.) | `skills/` directory (committed only) | sparse `git clone` |
 | Claude pointer commands for shared skills | `.claude/commands/` | sparse `git clone` plus non-destructive copy into the project `.claude/commands/` |
 | Claude project defaults (`effortLevel`, `permissions`, etc.) | `.claude/settings.json` | sparse `git clone` plus key-level merge into the project `.claude/settings.json` on every run |
 
@@ -128,7 +128,8 @@ Add `.agent-config/` to the project's `.gitignore` so fetched files are not comm
   1. `cd` into the submodule directory.
   2. Run git operations (always confirm with user first per Git Safety rules).
   3. Return to the parent repo and update the submodule pointer: `git add <submodule-path>` then commit.
-- Submodules may have a `.gitignore` that excludes internal-only files (e.g., `context/`, `.agent/`, `guardrail/`). These files exist on disk but are not pushed to the collaborator repo. On a fresh clone, they will be missing — warn the user if expected internal directories are absent.
+- Submodules may have a `.gitignore` that excludes internal-only files (e.g., `.agent/`, `guardrail/`, `figure-spec/`, `figure-src/`). These files exist on disk but are not pushed to the collaborator repo. On a fresh clone, they will be missing — warn the user if expected internal directories are absent.
+- `context/` is synced to co-PI repos and will be available after submodule init.
 - Project-specific submodule details (which directories, which upstream repos, which files are internal-only) belong in `CLAUDE.md` in each project repo, not here.
 
 ## Local Skills Precedence
