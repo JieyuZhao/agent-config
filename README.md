@@ -68,6 +68,7 @@ This makes the `codex` and `codex-reply` MCP tools available in all Claude Code 
 | `dual-pass-workflow` | Outer shell for two-pass tasks: first pass builds the artifact, optional second pass audits and reconciles. Works with any domain skill (paper review, bug fix, writing, frontend edit, etc.). |
 | `bibref-filler` | Add new external verified citations while keeping curated bibliography files stable, placing machine-added entries in a separate `working.bib`, and leaving visible unresolved notes instead of guessing. |
 | `figure-prompt-builder` | Build copy-ready prompts for explanatory figures such as overviews, workflows, mechanisms, timelines, and conceptual illustrations, using a small bundled reference bank when helpful. |
+| `implement-review` | Review loop for staged changes. Detects content type, sends to Codex (plugin or MCP) for review using established frameworks (Google/Microsoft for code, NeurIPS/ACL for papers, NSF/NIH for proposals), categorizes feedback, revises, and iterates. |
 
 ## Skill Usage
 
@@ -133,9 +134,15 @@ skills/
     assets/
       workflow.yaml                # Task packet template
       handoff.md, audit.md, reconcile.md  # Workflow note templates
+  implement-review/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    references/
+      review-lenses.md             # Framework-grounded review criteria (Google, NeurIPS, NSF, NIH)
 .claude/commands/
   bibref-filler.md                 # Claude Code pointer to SKILL.md
   figure-prompt-builder.md         # Claude Code pointer to SKILL.md
   dual-pass-workflow.md            # Claude Code pointer to SKILL.md
+  implement-review.md              # Claude Code pointer to SKILL.md
 .claude/settings.json              # Shared Claude project defaults (effortLevel, permissions, etc.)
 ```
