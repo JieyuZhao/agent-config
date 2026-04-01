@@ -59,7 +59,15 @@ Codex can be used from within Claude Code as an MCP server. Register once at the
 claude mcp add codex -s user -- codex mcp-server
 ```
 
-This makes the `codex` and `codex-reply` MCP tools available in all Claude Code sessions (any directory, any terminal). A session restart is required after registration for the tools to appear. Requires Node.js, the Codex CLI (`npm install -g @openai/codex`), and `OPENAI_API_KEY`. See the full setup notes in `AGENTS.md` under "Codex MCP Integration".
+This makes the `codex` and `codex-reply` MCP tools available in all Claude Code sessions (any directory, any terminal). A session restart is required after registration for the tools to appear. Requires Node.js, the Codex CLI (`npm install -g @openai/codex`), and `OPENAI_API_KEY`.
+
+**Windows note:** Claude Code launches MCP servers through bash, so `.cmd` wrappers do not work. If `codex` is not on `PATH`, use the full path with forward slashes and no `.cmd` extension:
+
+```bash
+claude mcp add codex -s user -- C:/Users/<you>/AppData/Roaming/npm/codex mcp-server
+```
+
+See the full setup notes in `AGENTS.md` under "Codex MCP Integration".
 
 ## Shared Skills
 
