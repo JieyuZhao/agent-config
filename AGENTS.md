@@ -1,5 +1,5 @@
 > If this file was fetched into `.agent-config/AGENTS.md`, treat the bootstrap block below as copy-paste setup for project repos, not as runtime instructions to execute again.
-> In the fetched copy, read and follow the shared rules starting at `## User Profile`.
+> In the fetched copy, read and follow the shared rules starting at `## Session Start Check`.
 
 ## Bootstrap: Shared Config and Skills
 
@@ -62,6 +62,19 @@ Add `.agent-config/` to the project's `.gitignore` so fetched files are not comm
 
 <!-- Everything above this line is bootstrap setup instructions. -->
 <!-- Everything below this line contains the shared rules that agents should read and follow. -->
+
+## Session Start Check
+
+After bootstrap, run these checks once and report a short summary. Only flag items that need attention — if everything is correct, a one-line confirmation is sufficient.
+
+1. **OS** -- Detect the platform (Windows, macOS, Linux) and note it for platform-specific behavior (e.g., terminal review path on Windows, MCP on macOS/Linux).
+2. **Claude Code model and effort** (Claude Code sessions only) -- If the current client exposes model and effort info, check them. The user prefers the highest available model (currently Opus) at high effort. If the session is on a different model or effort, mention it once — this is a preference, not a misconfiguration.
+3. **Codex config** -- If `~/.codex/config.toml` (or `%USERPROFILE%\.codex\config.toml` on Windows) exists, verify:
+   - `model = "gpt-5.4"` (or the latest available)
+   - `model_reasoning_effort = "xhigh"`
+   - `service_tier = "fast"` and `[features] fast_mode = true`
+   
+   If any are missing or outdated, report what needs to be updated.
 
 ## User Profile
 
