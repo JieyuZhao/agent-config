@@ -1,31 +1,39 @@
 ---
 name: implement-review
-description: Review loop for staged changes. Detects content type, prepares a review request for Codex (plugin or MCP), categorizes feedback, revises, and iterates. Works for code, papers, proposals, or any text-based output.
+description: Review loop for staged changes. Detects content type, prepares a review request for Codex (MCP, terminal, or plugin), categorizes feedback, revises, and iterates. Works for code, papers, proposals, or any text-based output.
 ---
 
 # Implement-Review
 
 ## Overview
 
-A review loop for staged changes. Claude Code detects the content type, sends the changes to Codex for review, categorizes the feedback, revises, and iterates. Works through two Codex channels depending on what is available.
+A review loop for staged changes. Claude Code detects the content type, sends the changes to Codex for review, categorizes the feedback, revises, and iterates. Works through three Codex channels: MCP (macOS/Linux default), terminal relay (Windows default), or IDE plugin.
 
 ## Codex Channels
 
-Two paths to Codex are supported. Both can be used in the same project.
+Three paths to Codex are supported. The skill picks the best available path automatically.
 
-### Plugin path (PyCharm / IDE)
-
-Codex runs as an IDE plugin with direct access to the repo. The user tells Codex to review in the plugin sidebar (e.g., "review the staged changes"). Codex can see the working tree and run `git diff` itself, so no diff needs to be copy-pasted. The user relays Codex's feedback back to Claude Code.
-
-### MCP path
+### MCP path (macOS / Linux default)
 
 Codex is registered as an MCP server (`codex` and `codex-reply` tools available). Claude Code calls `codex` directly with the review request and reads the response as a tool result. No user relay needed.
 
-At skill start, check whether the `codex` MCP tool is available in the current session. If it is, default to the MCP path. If not, fall back to the plugin path. The user can override at any time (e.g., "use the plugin instead").
+### Plugin path (IDE sidebar)
+
+Codex runs as an IDE plugin with direct access to the repo. The user tells Codex to review in the plugin sidebar (e.g., "review the staged changes"). Codex can see the working tree and run `git diff` itself, so no diff needs to be copy-pasted. The user relays Codex's feedback back to Claude Code.
+
+### Terminal path (Windows default)
+
+The user has a Codex interactive terminal window open alongside Claude Code. Claude Code prepares a copy-pasteable review prompt (summary, diff, lens, round number) and presents it as a fenced text block. The user copies it into the Codex terminal, then relays the feedback back to Claude Code. This avoids the MCP approval-prompt and Bitdefender friction on Windows.
+
+### Path selection
+
+1. **Windows**: default to the terminal path. If the `codex` MCP tool is available and the user explicitly asks to use MCP, use it instead.
+2. **macOS / Linux**: check whether the `codex` MCP tool is available. If yes, default to MCP. If not, fall back to the plugin or terminal path.
+3. The user can override at any time (e.g., "use MCP", "use the plugin", "use the terminal").
 
 ## Prerequisites
 
-Changes should be staged (`git add`) before invoking this skill. Untracked files are not visible to `git diff`, so they must be staged first. If nothing is staged, there is nothing to review.
+At skill start, check for staged changes (`git diff --cached`). If nothing is staged but unstaged or untracked changes exist, list them and ask the user whether to stage all (`git add -A`), stage specific files, or abort. Do not auto-stage without confirmation — untracked files may be sensitive or unrelated. If there are no changes at all, there is nothing to review -- inform the user and stop.
 
 ## Phase 1: Prepare and Send Review
 
@@ -59,8 +67,26 @@ Prepare a review request with:
 - If the call succeeds and returns a non-empty response, proceed to Phase 2.
 - If the call fails (error, timeout, empty response, or the user denies the tool call), do **not** silently continue. Instead:
   1. Report the failure clearly, including the error message if one was returned.
-  2. Ask the user whether to retry via MCP, fall back to the plugin path, or abort.
+  2. Ask the user whether to retry via MCP, fall back to the terminal or plugin path, or abort.
   3. Do not guess or fabricate a review response.
+
+**Terminal path**: Present a copy-pasteable review prompt as a fenced text block. Include all context inline so the user can paste it directly into the Codex terminal window without modification:
+
+````
+Review the staged changes in <repo path>. Round <N>.
+
+Summary: <one to three sentences>
+
+Diff:
+```diff
+<git diff --cached output, or summary for large diffs>
+```
+
+Review lens (<content type>):
+<numbered criteria from review-lenses.md>
+````
+
+Then wait for the user to relay Codex's feedback.
 
 **Plugin path**: Tell the user the changes are ready for review and suggest what to tell Codex in the plugin, e.g.:
 > "Review the staged changes. Focus on [detected lens]."
