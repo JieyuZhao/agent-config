@@ -234,7 +234,7 @@ class RepoValidationTests(unittest.TestCase):
             self.agents_text,
         )
         self.assertIn(
-            "read and follow the shared rules starting at `## User Profile`",
+            "read and follow the shared rules starting at `## Session Start Check`",
             self.agents_text,
         )
 
