@@ -53,21 +53,7 @@ GitHub Actions runs the same test suite on Ubuntu and Windows for every push and
 
 ## Codex MCP Integration
 
-Codex can be used from within Claude Code as an MCP server. Register once at the user level:
-
-```bash
-claude mcp add codex -s user -- codex mcp-server
-```
-
-This makes the `codex` and `codex-reply` MCP tools available in all Claude Code sessions (any directory, any terminal). A session restart is required after registration for the tools to appear. Requires Node.js, the Codex CLI (`npm install -g @openai/codex`), and `OPENAI_API_KEY`.
-
-**Windows note:** Claude Code launches MCP servers through bash, so `.cmd` wrappers do not work. If `codex` is not on `PATH`, use the full path with forward slashes and no `.cmd` extension:
-
-```bash
-claude mcp add codex -s user -- C:/Users/<you>/AppData/Roaming/npm/codex mcp-server
-```
-
-See the full setup notes in `AGENTS.md` under "Codex MCP Integration".
+Codex can be used from within Claude Code as an MCP server. See [AGENTS.md — Codex MCP Integration](AGENTS.md#codex-mcp-integration) for full setup instructions (registration, Windows path, approval policy, Bitdefender workarounds).
 
 ## Shared Skills
 
@@ -80,33 +66,16 @@ See the full setup notes in `AGENTS.md` under "Codex MCP Integration".
 
 ## Skill Usage
 
-After bootstrap, mention the skill name directly in the prompt. In Claude Code, the matching pointer command under `.claude/commands/` provides the same entry point.
-
-Use `bibref-filler` by itself when the main job is to add new external citations safely:
-
-```text
-Use $bibref-filler on <target-files-or-task-root>. Add new external verified citations only, put every machine-added entry into a separate working.bib next to the active main bib files, and leave visible TODOs instead of guessing.
-```
-
-Use `dual-pass-workflow` with `bibref-filler` when you want a first pass to add citations and a second pass to audit citation integrity:
-
-```text
-Use $dual-pass-workflow and $bibref-filler on <target-files-or-task-root> in first-pass mode. Add new external verified citations only, keep curated main bib files unchanged, and place machine-added entries in working.bib.
-```
-
-```text
-Use $dual-pass-workflow and $bibref-filler on <target-files-or-task-root> in second-pass mode focusing on citation existence, exact metadata, and whether every machine-added entry is isolated in working.bib.
-```
-
-Typical split:
-
-1. `first-pass`: find real external papers, verify canonical metadata, add entries to `working.bib`, and patch citations into the target files.
-2. `second-pass`: independently check that no inserted citation points to a nonexistent paper, metadata is exact, and new entries were not mixed into the curated main bib files.
+After bootstrap, mention the skill name directly in the prompt. In Claude Code, the matching pointer command under `.claude/commands/` provides the same entry point. Each skill's `SKILL.md` contains full usage instructions and examples.
 
 ## Structure
 
 ```
 AGENTS.md                          # Shared agent config (entry point)
+docs/
+  claude-code-tips.md              # Workflows and best practices
+  claude-code-reference.md         # Keyboard shortcuts, slash commands, vim mode
+  claude-code-extras.md            # Buddy/companion, plugins
 bootstrap/
   bootstrap.ps1                   # Windows bootstrap logic
   bootstrap.sh                    # Unix bootstrap logic
