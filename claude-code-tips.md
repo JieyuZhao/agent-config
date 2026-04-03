@@ -517,6 +517,53 @@ When working on a branch with an open pull request, Claude Code displays a click
 
 PR status requires the `gh` CLI to be installed and authenticated (`gh auth login`).
 
+## 25. Buddy / Companion
+
+Run `/buddy` to hatch a terminal companion. The companion is **deterministic**: Claude Code hashes your user ID with a hardcoded salt (`friend-2026-401`) through a Mulberry32 PRNG to roll rarity, species, eyes, hat, and shiny status. Your account always produces the same companion.
+
+**Rarity odds:**
+
+| Rarity    | Chance |
+|-----------|--------|
+| Common    | 60%    |
+| Uncommon  | 25%    |
+| Rare      | 10%    |
+| Epic      | 4%     |
+| Legendary | 1%     |
+
+Shiny is an independent 1% roll on top of rarity, making a shiny legendary a 1-in-10,000 outcome. Common companions cannot have hats.
+
+### Forcing a specific companion with ccbuddyy
+
+Since the companion is fully determined by the salt, changing the salt changes the result. [ccbuddyy](https://github.com/vibenalytics/ccbuddyy) patches the salt in the Claude Code binary to produce whatever companion you want.
+
+```bash
+# Interactive — browse pre-searched legendaries
+npx ccbuddyy
+
+# Specific build
+npx ccbuddyy build -species dragon -rarity legendary -hat crown
+
+# Shiny legendary (brute-forces salts, ~100x slower)
+npx ccbuddyy build -species penguin -rarity legendary -shiny
+
+# See current companion
+npx ccbuddyy current
+
+# Restore original binary
+npx ccbuddyy restore
+```
+
+**Species:** duck, goose, blob, cat, dragon, octopus, owl, penguin, turtle, snail, ghost, axolotl, capybara, cactus, robot, rabbit, mushroom, chonk
+
+**Hats:** crown, tophat, propeller, halo, wizard, beanie, tinyduck
+
+**Eyes:** dot, star, x, circle, at, degree
+
+Visual builder: [ccbuddy.dev](https://ccbuddy.dev)
+
+**After Claude Code updates:** each update replaces the binary and resets the companion. Re-run `npx ccbuddyy` to re-patch.
+
 ---
 
 ## See Also
