@@ -63,6 +63,7 @@ Codex can be used from within Claude Code as an MCP server. See [AGENTS.md — C
 | `bibref-filler` | Add new external verified citations while keeping curated bibliography files stable, placing machine-added entries in a separate `working.bib`, and leaving visible unresolved notes instead of guessing. |
 | `figure-prompt-builder` | Build copy-ready prompts for explanatory figures such as overviews, workflows, mechanisms, timelines, and conceptual illustrations, using a small bundled reference bank when helpful. |
 | `implement-review` | Review loop for staged changes. Detects content type, sends to Codex (plugin or MCP) for review using established frameworks (Google/Microsoft for code, NeurIPS/ACL for papers, NSF/NIH for proposals), categorizes feedback, revises, and iterates. |
+| `my-router` | Context-aware dispatcher that detects work type (papers, proposals, code, figures, citations, admin) and routes to the right domain skill. Works as the inner decision loop within superpowers' execution phase. |
 
 ## Skill Usage
 
@@ -116,7 +117,13 @@ skills/
     agents/openai.yaml             # Codex wrapper
     references/
       review-lenses.md             # Framework-grounded review criteria (Google, NeurIPS, NSF, NIH)
+  my-router/
+    SKILL.md                       # Context-aware dispatcher for academic tasks
+    agents/openai.yaml             # Codex wrapper
+    references/
+      routing-table.md             # Quick-reference routing table and lens selection
 .claude/commands/
+  my-router.md               # Claude Code pointer to SKILL.md
   bibref-filler.md                 # Claude Code pointer to SKILL.md
   figure-prompt-builder.md         # Claude Code pointer to SKILL.md
   dual-pass-workflow.md            # Claude Code pointer to SKILL.md

@@ -1,4 +1,4 @@
-<!-- Quick start: In Claude Code, type "read @AGENTS.md to run the bootstrap and session checks" -->
+<!-- Quick start: In Claude Code, read @AGENTS.md to run bootstrap, session checks, and task routing -->
 
 > If this file was fetched into `.agent-config/AGENTS.md`, treat the bootstrap block below as copy-paste setup for project repos, not as runtime instructions to execute again.
 > In the fetched copy, read and follow the shared rules starting at `## Session Start Check`.
@@ -90,6 +90,13 @@ After bootstrap, run **all** of the following checks and report results in a sho
 - **Claude Code** is the primary workhorse: drafting, implementation, research, and heavy-lifting tasks.
 - **Codex** is the gatekeeper: review, feedback, and quality checks on work produced by Claude Code or the user.
 - When both agents are available, default to this division of labor unless the user overrides it.
+
+## Task Routing
+
+- Before starting a task, read the router skill to determine which domain skill to use. Look for it in this order: `skills/my-router/SKILL.md` (repo-local), then `.agent-config/repo/skills/my-router/SKILL.md` (bootstrapped from shared config).
+- The router inspects prompt keywords, file types, and project structure to dispatch automatically. Do not ask the user which skill to use when the routing table provides a clear match.
+- If the `superpowers` plugin is active, the router operates during the execution phase. Superpowers handles the outer workflow (brainstorm, plan, execute, verify); the router handles inner dispatch to the right domain skill.
+- If routing is ambiguous (multiple skills could apply), state the detected context and proposed skill, then ask the user to confirm.
 
 ## Codex MCP Integration
 
