@@ -69,6 +69,37 @@ Rating scale: Excellent / Very Good / Good / Fair / Poor (narrative, no numerica
 5. **Clarity** -- Can a panel reviewer skim and extract the key points?
 6. **Formatting** -- Page limits, required sections, font and margin compliance.
 
+## Focused Sub-Lenses and Agency-Specific Lenses
+
+Full lenses cover all criteria for a content type. Two kinds of narrower lens are available:
+
+- **Focused sub-lenses** select a subset of the parent lens criteria. Use them when the change is narrow (e.g., formatting only, tests only) or when the full lens produces too much generic feedback.
+- **Agency-specific lenses** replace the generic proposal lens with the evaluation framework for a known agency. They are complete lenses, not subsets.
+
+If unsure which to use, use the full parent lens and add an "additional focus" to the review prompt.
+
+### Focused sub-lenses
+
+| Name | Parent | Criteria | When to use |
+|---|---|---|---|
+| `code/security` | Code | Items 4, 5 (security, error handling) | Security-sensitive changes, dependency updates |
+| `code/tests` | Code | Items 6, 2 (tests, functionality) | Test-only changes or changes that should have tests |
+| `paper/formatting` | Paper | Items 7, 9 (figures/tables, writing quality) | Layout, style, or venue compliance changes |
+| `paper/content` | Paper | Items 1-5 (soundness through related work) | Substantive content or argument changes |
+| `paper/submission-ready` | Paper | Items 7, 8, 9 plus anonymization checks and page-limit compliance | Blind-submission preparation (pre-acceptance) |
+| `proposal/compliance` | Proposal | Common items 1, 6 (alignment with call, formatting) | Formatting and solicitation compliance checks |
+
+When using a focused sub-lens, include only the referenced parent criteria in the review prompt, not the full lens. For `paper/submission-ready`, also add: verify no author-identifying information remains and confirm the paper meets venue page limits.
+
+### Agency-specific lenses
+
+| Name | Replaces | Framework | When to use |
+|---|---|---|---|
+| `proposal/nsf` | Proposal (generic) | NSF Merit Review: Intellectual Merit, Broader Impacts, five elements each | NSF proposals when agency is known |
+| `proposal/nih` | Proposal (generic) | NIH Simplified Peer Review: Importance, Rigor and Feasibility, Expertise and Resources | NIH proposals when agency is known |
+
+When using an agency-specific lens, include the full agency framework from the Proposal section above (NSF or NIH subsection). Always also include the Common proposal dimensions (alignment with call, feasibility, significance, budget, clarity, formatting), as these apply regardless of agency.
+
 ## General
 
 Fallback lens when content type does not match the above or is mixed.
