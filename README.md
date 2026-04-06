@@ -63,6 +63,7 @@ Codex can be used from within Claude Code as an MCP server. See [AGENTS.md — C
 | `bibref-filler` | Add new external verified citations while keeping curated bibliography files stable, placing machine-added entries in a separate `working.bib`, and leaving visible unresolved notes instead of guessing. |
 | `figure-prompt-builder` | Build copy-ready prompts for explanatory figures such as overviews, workflows, mechanisms, timelines, and conceptual illustrations, using a small bundled reference bank when helpful. |
 | `implement-review` | Review loop for staged changes. Detects content type, sends to Codex (plugin or MCP) for review using established frameworks (Google/Microsoft for code, NeurIPS/ACL for papers, NSF/NIH for proposals), categorizes feedback, revises, and iterates. |
+| `ci-mockup-figure` | Build interactive HTML mockups of systems, methodological flowcharts, dashboards, and timelines, then capture as space-efficient figures for papers and proposals. |
 | `my-router` | Context-aware dispatcher that detects work type (papers, proposals, code, figures, citations, admin) and routes to the right domain skill. Works as the inner decision loop within superpowers' execution phase. |
 
 ## Skill Usage
@@ -112,6 +113,9 @@ skills/
     assets/
       workflow.yaml                # Task packet template
       handoff.md, audit.md, reconcile.md  # Workflow note templates
+  ci-mockup-figure/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
   implement-review/
     SKILL.md                       # Skill definition
     agents/openai.yaml             # Codex wrapper
@@ -125,6 +129,7 @@ skills/
 .claude/commands/
   my-router.md               # Claude Code pointer to SKILL.md
   bibref-filler.md                 # Claude Code pointer to SKILL.md
+  ci-mockup-figure.md              # Claude Code pointer to SKILL.md
   figure-prompt-builder.md         # Claude Code pointer to SKILL.md
   dual-pass-workflow.md            # Claude Code pointer to SKILL.md
   implement-review.md              # Claude Code pointer to SKILL.md
