@@ -1,16 +1,16 @@
 ---
 name: ci-mockup-figure
-description: Create space-efficient proposal figures by building interactive HTML mockups of proposed systems and timelines, then capturing landscape screenshots. The primary goal is maximizing information per page in a 15-page proposal — every figure must earn its space. Use for NSF CI proposals that need credible system interface figures instead of generic pipeline diagrams.
+description: Create space-efficient figures by building interactive HTML mockups of systems, methodological flowcharts, dashboards, and timelines, then capturing landscape screenshots. The primary goal is maximizing information per page — every figure must earn its space. Use for papers, proposals, or any document that needs credible figures (system interfaces, method pipelines, architectural flowcharts) instead of generic diagrams.
 ---
 
 # CI Mockup Figure
 
 ## Overview
 
-The goal is **space-efficient, information-dense proposal figures** that
-communicate the proposed system's design in minimal page area. The method:
-build an interactive HTML mockup, capture horizontal screenshots, insert as
-compact wrapfigures or subfloat grids.
+The goal is **space-efficient, information-dense figures** that communicate
+a system's design, a method's pipeline, or an architectural flowchart in
+minimal page area. The method: build an interactive HTML mockup, capture
+horizontal screenshots, insert as compact wrapfigures or subfloat grids.
 
 Every figure must pass the space test: does this figure communicate more per
 square inch than the text it displaces? If a full-width figure takes half a
@@ -18,14 +18,37 @@ page but only says "A → B → C → D", it fails. A wrapfigure showing an
 interactive prototype with search results, graph nodes, and real data labels
 passes because it communicates system design, data model, and UX simultaneously.
 
-This skill works best for NSF CISE/OAC proposals (FAIROS, OKN, POSE, CSSI,
-FIRE) where the deliverable is a software system or infrastructure and
-reviewers evaluate whether the proposed system is credible and well-conceived.
+This skill works for any document where figures need to communicate design
+or methodology credibly: research papers (method overview, architecture
+diagrams, pipeline flowcharts), proposals (NSF, NIH, DOE, etc.), technical
+reports, or demo writeups. It is especially effective when the figure needs
+to show multi-component structure, data flow, or step-by-step methodology
+and reviewers evaluate whether the design is credible and well-conceived.
+
+### HTML mockups vs TikZ/LaTeX diagrams
+
+HTML mockups are preferred over TikZ for most flowcharts, pipelines, and
+system diagrams. TikZ tends to produce dated, rigid-looking output and is
+harder to iterate on.
+
+| | HTML mockup | TikZ |
+|---|---|---|
+| Visual polish | Modern CSS, shadows, gradients, rounded cards | Flat, academic-looking boxes |
+| Iteration speed | Change CSS and refresh | Recompile LaTeX, debug positioning |
+| Layout control | Flexbox/grid, responsive | Manual coordinate math |
+| Color/font variety | Full CSS + web fonts | Limited, verbose color defs |
+| Interactivity | View switching, capture mode | Static only |
+
+**Prefer HTML** for system mockups, method pipelines, flowcharts, dashboards,
+and Gantt/timeline figures. **TikZ is fine** for small inline diagrams that
+must live inside the LaTeX source (e.g., a commutative diagram in math, a
+small decision tree) or when exact font matching with the document body is
+critical.
 
 ### HTML mockups vs AI image generation
 
-HTML mockups are strictly better than AI-generated images for proposal system
-figures. AI image generation is acceptable only for artistic/conceptual
+HTML mockups are strictly better than AI-generated images for system and
+method figures. AI image generation is acceptable only for artistic/conceptual
 overview diagrams.
 
 | | HTML mockup | AI image generation |
@@ -50,16 +73,26 @@ HTML is also better than PPTX for Gantt/timeline figures:
 
 ## When to Use
 
-- The proposal describes a multi-component system (e.g., "representation layer
-  + discovery service + workflow engine")
-- Abstract pipeline diagrams feel generic and do not differentiate the proposal
-- Co-PIs need something interactive to react to and iterate on
-- The proposal has a 15-page limit and figures need to be space-efficient
-- A timeline/Gantt figure is needed for the work plan section
+- The document describes a multi-component system or multi-step methodology
+  (e.g., "representation layer + discovery service + workflow engine", or
+  "data collection → feature extraction → model training → evaluation")
+- Abstract pipeline diagrams feel generic and do not differentiate the work
+- The figure needs to show architectural structure, data flow, or method
+  pipeline with real labels, not just boxes and arrows
+- Collaborators need something interactive to react to and iterate on
+- The document has a page limit and figures need to be space-efficient
+- A timeline/Gantt figure is needed for the work plan or project overview
+
+### When NOT to Use
+
+- **Experimental result figures** (plots, charts, tables, ablation curves) --
+  use Python (matplotlib, seaborn, plotly) or LaTeX (pgfplots, tikz) instead.
+  This skill is for system/method diagrams, not data visualization.
 
 ## Space Budget (decide first)
 
-Before designing anything, decide the figure budget for the proposal:
+Before designing anything, decide the figure budget for the document. The
+table below uses LaTeX environments as examples; adapt to the target format.
 
 | Figure type | Space cost | When to use |
 |---|---|---|
@@ -73,9 +106,9 @@ the remaining text column is too narrow for comfortable reading and the prose
 wraps through multiple paragraphs. Default to **0.55–0.56\textwidth** for
 system mockups. Use 0.68 only for simple figures with large text.
 
-**Rule of thumb for a 15-page proposal:**
-- 3 thrust figures as wrapfigures = ~1.5 pages of figure space
-- 1 overview figure (existing) + 1 motivation figure = ~1 page
+**Rule of thumb for page-limited documents (e.g., 15-page proposal):**
+- 3 main figures as wrapfigures = ~1.5 pages of figure space
+- 1 overview figure + 1 motivation figure = ~1 page
 - Total figure budget: ~2.5 pages out of 15 (17%) — leave 83% for text
 
 **Horizontal layout is mandatory.** Vertical/portrait screenshots waste 50%+
