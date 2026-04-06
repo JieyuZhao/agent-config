@@ -83,9 +83,14 @@ def ensure_copyable(dest: Path, overwrite: bool) -> None:
         )
 
 
+def _copy_ignore(directory: str, contents: list[str]) -> set[str]:
+    """Exclude PI-level files that should not be duplicated per proposal."""
+    return {c for c in contents if c.startswith("40-collaboration-history-tracker")}
+
+
 def instantiate_template(template_dir: Path, dest: Path, overwrite: bool) -> None:
     ensure_copyable(dest, overwrite)
-    shutil.copytree(template_dir, dest, dirs_exist_ok=overwrite)
+    shutil.copytree(template_dir, dest, dirs_exist_ok=overwrite, ignore=_copy_ignore)
 
 
 def ensure_working_layout(dest: Path) -> None:

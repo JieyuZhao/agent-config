@@ -93,8 +93,18 @@ Mapping guidance:
   direct edits to the proposal entrypoint.
 - Treat `template/context/team/_template/profile.md` as the reusable schema for
   PI-source-material normalization before writing qualification prose.
+- Treat `template/context/team/<person>/` as the canonical source for the PI's
+  general profile and auto-synced raw assets (cv-full.tex, publications.json,
+  etc.). Proposal-level `context/team/<person>/profile.md` adds
+  proposal-specific overlay (Project Role, Writing Notes).
 - Use `template/32-collaboration-plan.tex` and `template/33-bpc.tex` only when
   the solicitation or project design makes them material.
+- Letters of collaboration or support go in `<proposal-dir>/letters/`. Reusable
+  Word templates are in `template/letters/`. Default to the collaboration
+  template (PAPPG single-sentence format); use the support template only when
+  the solicitation explicitly requires letters of support. See
+  `skills/nsf-proposal-guardrail/references/template-mapping.md` for the full
+  distinction and preflight rules.
 
 ## Drafting Order
 

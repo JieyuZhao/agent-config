@@ -31,8 +31,8 @@ Use it when the user asks for work such as:
 - leave visible TODOs for unresolved citations or collaborator facts
 
 If the request goes beyond a local figure concept and needs an actual figure
-spec, editable-source plan, or outside-tool handoff, switch to
-`nsf-figure-builder`.
+brief, downstream prompt pack, or outside-tool handoff, switch to
+`figure-prompt-builder`.
 
 If the request is primarily a citation pass, asks for explicit citation
 density, requires careful external verification, or needs new entries added to

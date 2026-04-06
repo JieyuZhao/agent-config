@@ -7,7 +7,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 
 
-IGNORE_FILENAMES = {"10-aim0-example1.tex", "10-aim0-example2.tex"}
+IGNORE_FILENAMES = {"10-aim0-example.tex", "10-aim0-example1.tex", "10-aim0-example2.tex"}
 SKIP_DIR_PARTS = {"context", "guardrail", "out", "figure", "figure-src", "figure-spec"}
 HEADING_RE = re.compile(
     r"^\s*\\(?P<level>section|subsection|subsubsection)\*?"
@@ -85,11 +85,26 @@ def word_needs_capitalization(word: str) -> bool:
 def find_offending_words(title: str) -> list[str]:
     cleaned = normalize_title(title)
     offending: list[str] = []
+    # Track whether the next word is in a "first-word" position:
+    # start of the title, or immediately after a colon.
+    first_position = True
     for token in cleaned.split():
         for part in WORD_SPLIT_RE.split(token):
             word = part.strip(TRIM_CHARS)
-            if word_needs_capitalization(word):
+            if not word:
+                continue
+            if first_position:
+                # First word of heading or after colon must be capitalized
+                # even if it is a connector word.
+                if word and word[0].islower() and any(c.isalpha() for c in word):
+                    offending.append(word)
+            elif word_needs_capitalization(word):
                 offending.append(word)
+            first_position = False
+        # If the original token ends with a colon, the next word is in
+        # first-word position (subtitle rule).
+        if token.rstrip().endswith(":"):
+            first_position = True
     return offending
 
 

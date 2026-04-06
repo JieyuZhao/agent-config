@@ -1,13 +1,21 @@
 # External Handoff
 
 Use this file when the user wants to involve an outside tool such as Gemini,
-Claude, ChatGPT image tools, Sora, or Nano Banana to reduce manual drawing
+Claude, ChatGPT image tools, Sora, Midjourney, Flux, or another image model to reduce manual drawing
 work.
 
 ## Goal
 
-Use outside tools for ideation and visual exploration, not as the final
-editable source of truth.
+Use outside tools for whichever role actually helps:
+
+- ideation
+- first draft generation
+- near-final production
+- final production
+
+Do not assume an outside-model output must be rebuilt locally. Rebuild only
+when the output still misses the quality, readability, or editability bar the
+user actually needs.
 
 ## Cross-Model Prompt Strategy
 
@@ -30,7 +38,7 @@ Structure that prompt in this order:
 Do not include repo-only instructions such as:
 
 - local folder names
-- editable-source plans
+- local brief details
 - review rubrics
 - file naming conventions
 - notes to future collaborators
@@ -46,10 +54,11 @@ version of the following:
 - use consistent visual encoding across the full figure
 - assign color by functional role, not arbitrarily
 - use a colorblind-friendly palette
-- benchmark against high-end scientific schematics and polished grant figures
+- benchmark against high-end scientific schematics and polished research
+  figures
 - keep a white or soft off-white background
-- keep the figure legible when scaled down in a proposal PDF
-- keep the layout modular and vector-friendly for later Illustrator cleanup
+- keep the figure legible at the intended output size
+- keep the layout clean enough for optional later cleanup
 
 It is acceptable to use a soft prestige anchor such as
 `Nature/Cell-family scientific schematics` if the user clearly wants that level
@@ -59,7 +68,7 @@ specific biological styling.
 ## Minimal Universal Prompt Template
 
 ```text
-Create a publication-quality scientific figure for a research proposal.
+Create a publication-quality scientific figure.
 
 Core message:
 [one paragraph]
@@ -86,28 +95,54 @@ Visual quality requirements:
 - make causal directionality explicit
 - use consistent visual encoding across the figure
 - assign color by functional role with a colorblind-friendly palette
-- benchmark against high-end scientific schematics and polished grant figures
+- benchmark against high-end scientific schematics and polished research figures
 - use a white or soft off-white background
-- keep the figure modular and suitable for later vector cleanup
+- keep the figure clean enough for optional later cleanup
 
 Output quality requirements:
 - large readable labels
 - minimal decorative clutter
 - avoid photorealism
 - avoid dense tiny text
-- keep the image clear when placed in a proposal PDF
+- keep the image clear at the intended final size
 ```
 
-## Import Back Into This Repo
+## Import Back Into This Repo Or Workspace
 
 When the user gets a returned image or draft:
 
 1. if it should stay in the repo, place it under
-   `<proposal-dir>/figure-src/reference/`
-2. compare it with the original figure spec
-3. preserve only the layout or grouping ideas that actually help
-4. rebuild the final figure in `<proposal-dir>/figure-src/`
-5. export the final PDF into `<proposal-dir>/figure/`
+   `<work-dir>/figure-src/reference/` or another agreed local folder
+2. compare it with the original figure brief
+3. decide whether the output is:
+   - inspiration only
+   - a draft to clean up
+   - already acceptable as final
+4. if the draft is close but not right, reprompt with delta feedback before
+   escalating to cleanup or rebuild
+5. rebuild or clean up locally only if needed
+6. place the final deliverable in `<work-dir>/figure/` or another agreed final
+   asset location when the workspace uses one
+
+## Iterative Reprompting
+
+When the first generation is directionally correct but still wrong in detail:
+
+- keep what already works explicitly
+- describe the required deltas instead of rewriting the whole prompt
+- change one to three things per round when possible
+- if layout, semantics, and style are all wrong at once, restart from the
+  original brief rather than stacking contradictory revision prompts
+
+Good delta feedback looks like:
+
+- keep the current hub-and-spoke layout, but enlarge labels and remove the
+  background texture
+- preserve the current color roles, but reduce decorative icons and clarify
+  the directional arrows
+- keep the overall composition, but replace the center artwork with a cleaner
+  workflow schematic
+- keep the top-level structure, but shorten all in-figure text to noun phrases
 
 ## Acceptable Uses Of Outside Outputs
 
@@ -115,11 +150,14 @@ When the user gets a returned image or draft:
 - icon placement inspiration
 - grouping and flow inspiration
 - general color and spacing inspiration
+- strong first draft
+- acceptable final figure when the user is satisfied
 
-## Not Acceptable As Default Final Source
+## When To Escalate To Cleanup Or Rebuild
 
-- raster image with tiny fixed text
-- image that cannot be updated when the proposal changes
-- image whose structure does not match the active intro or thrust text
-- image that looks like a generic dashboard, startup infographic, or marketing
-  poster rather than a scientific proposal figure
+- tiny unreadable fixed text
+- incorrect structure or missing semantic elements
+- weak visual hierarchy
+- artifacts that will obviously break under expected revisions
+- output that looks like a generic dashboard, startup infographic, or marketing
+  poster rather than a technical figure

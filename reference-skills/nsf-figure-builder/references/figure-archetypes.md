@@ -1,12 +1,18 @@
 # Figure Archetypes
 
-Use this file to map a proposal need to one of a small number of reusable
+Use this file to map a research or technical communication need to one of a
+small number of reusable
 figure patterns.
+
+The representative examples below are mostly NSF-proposal examples from this
+repo. Treat them as structural analogies, not as exact templates, when the
+task is for a paper, slide deck, poster, web page, or another non-proposal
+artifact.
 
 ## 1. Overview Architecture
 
-Use when the proposal introduction needs a single visual summary of the whole
-project.
+Use when the introduction, opening slide, landing page, or summary section
+needs a single visual summary of the whole project.
 
 Typical content:
 
@@ -25,8 +31,8 @@ Representative examples in this repo:
 
 ## 2. Thrust Mechanism
 
-Use when a single thrust or aim needs one picture that clarifies the local
-mechanism.
+Use when one method unit, section, subsystem, or capability needs one picture
+that clarifies the local mechanism.
 
 Typical content:
 
@@ -46,7 +52,7 @@ Representative examples:
 
 ## 3. Workflow Or Method Pipeline
 
-Use when the proposal needs a concrete task flow, algorithm pipeline, or
+Use when the task needs a concrete process flow, algorithm pipeline, or
 data-processing path.
 
 Typical content:
@@ -67,7 +73,7 @@ Representative examples:
 
 ## 4. Timeline Or Work Plan
 
-Use for proposal-wide sequencing, milestones, and collaboration logic.
+Use for sequencing, milestones, rollout logic, and collaboration logic.
 
 Typical content:
 
@@ -88,7 +94,7 @@ Representative examples:
 ## 5. Ecosystem Or Adoption
 
 Use for open-ecosystem, infrastructure, governance, or community-building
-proposals.
+figures.
 
 Typical content:
 
@@ -108,8 +114,8 @@ Representative examples:
 
 ## 6. Evidence Or Impact
 
-Use when the figure's main job is to document uptake, citation, reach, or
-deployment evidence rather than method mechanics.
+Use when the figure's main job is to document uptake, citation, reach,
+deployment evidence, or validation footprint rather than method mechanics.
 
 Typical content:
 
@@ -127,9 +133,10 @@ Representative examples:
 
 ## Quick Heuristic
 
-- if the whole proposal needs one memorable picture, choose
+- if the whole project needs one memorable picture, choose
   `overview-architecture`
-- if one thrust is still hard to explain, choose `thrust-mechanism`
+- if one subsystem or unit is still hard to explain, choose
+  `thrust-mechanism`
 - if the logic is a process, choose `workflow-or-method-pipeline`
 - if the question is sequencing or milestones, choose `timeline-or-work-plan`
 - if the question is community or infrastructure growth, choose

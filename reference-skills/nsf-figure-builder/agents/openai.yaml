@@ -1,4 +1,4 @@
 interface:
-  display_name: "NSF Figure Builder"
-  short_description: "Turn proposal text into editable figure specs and model-neutral figure prompts"
-  default_prompt: "Use $nsf-figure-builder to decide what figure my intro or thrust needs, draft a figure spec and caption, and save a model-neutral prompt I can paste into an external image tool."
+  display_name: "Figure Prompt Builder"
+  short_description: "Turn source text or figure ideas into copy-ready downstream image-model prompts"
+  default_prompt: "Use $figure-prompt-builder to decide what figure this section needs, distill the core message into a concise figure brief, and write a prompt pack I can paste into a downstream image model."

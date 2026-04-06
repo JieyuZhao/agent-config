@@ -151,7 +151,26 @@ python skills\nsf-proposal-guardrail\scripts\check_heading_case.py --proposal-di
 6. Also treat missing cleaned investigator profiles under
    `<proposal-dir>/context/team/<person>/profile.md` as a preflight gap, because
    those files are the preferred drafting-time source for team qualification.
-7. Report findings in descending priority:
+   For the PI, a profile under `template/context/team/<person>/profile.md`
+   satisfies this check as a fallback — the PI's general profile is maintained
+   at the template level and shared across proposals.
+7. Run a letter-type compliance check:
+   - Letters of collaboration are permitted under PAPPG for substantial
+     unfunded collaborations unless the solicitation says otherwise.
+     Letters of support are submitted only when a solicitation explicitly
+     requires them.
+   - Flag any letters of support when the solicitation does not explicitly
+     request them (PAPPG 24-1: unsolicited letters of support may cause
+     return without review).
+   - Flag any collaboration letter that contains endorsements or evaluative
+     language beyond the PAPPG single-sentence template.
+   - Flag any substantial unfunded collaborator mentioned in the Project
+     Description or Facilities section who lacks a corresponding letter.
+     Budgeted collaborators (subawards, consultants) and non-person resource
+     mentions do not require a letter unless the solicitation says otherwise.
+   - See `references/template-mapping.md` for the full collaboration-vs-support
+     distinction and template locations.
+8. Report findings in descending priority:
    - missing required items
    - present but likely noncompliant items
    - unresolved conditional items

@@ -39,23 +39,24 @@ List the short labels or box text that should appear in the figure.
 
 ## Caption Draft
 
-Write a concise proposal-ready caption.
+Write a concise audience-ready caption.
 
-## Editable Source Plan
+## Generation Plan
 
-- Preferred source format:
-- Source file under `figure-src/`:
-- Final exported file under `figure/`:
+- Preferred generation path:
+- Optional editable source file under `figure-src/`:
+- Final deliverable under `figure/` or another agreed output path:
 
 ## Outside-Tool Prompt Pack
 
-If using Gemini/Sora/Nano Banana, place the final structured prompt here.
+If using Gemini, Sora, Midjourney, Flux, or another image model, place the
+final structured prompt here.
 
 ## TODO
 
 - [ ] Finalize labels
-- [ ] Build editable source
-- [ ] Export PDF
+- [ ] Generate or build the figure
+- [ ] Save or export the final deliverable
 """
 
 
@@ -75,9 +76,10 @@ def main() -> None:
             return current_candidate
         return (repo_root / path).resolve()
 
-    def detect_proposal_dir(repo_root: Path, current_dir: Path) -> Path | None:
+    def detect_workspace_dir(repo_root: Path, current_dir: Path) -> Path:
+        workspace_markers = ("figure-spec", "figure-src", "figure", "00-project-description.tex")
         for candidate in (current_dir.resolve(), *current_dir.resolve().parents):
-            if (candidate / "00-project-description.tex").exists() and (candidate / "figure-spec").exists():
+            if any((candidate / marker).exists() for marker in workspace_markers):
                 return candidate
             if candidate == repo_root:
                 break
@@ -87,21 +89,27 @@ def main() -> None:
         workspaces = [
             path.resolve()
             for path in sorted(legacy.iterdir())
-            if path.is_dir() and (path / "00-project-description.tex").exists()
+            if path.is_dir()
+            and any((path / marker).exists() for marker in workspace_markers)
         ] if legacy.exists() else []
         if len(workspaces) == 1:
             return workspaces[0]
-        return None
+        return current_dir.resolve()
 
     parser = argparse.ArgumentParser(
-        description="Create a figure spec scaffold for the active proposal."
+        description="Create a figure brief scaffold for the active figure workspace."
+    )
+    parser.add_argument(
+        "--workspace-dir",
+        help=(
+            "Figure workspace path such as `proposals/nsf-25-533-fairos`. "
+            "If omitted, the script will try to infer the current workspace."
+        ),
     )
     parser.add_argument(
         "--proposal-dir",
-        help=(
-            "Proposal workspace path such as `proposals/nsf-25-533-fairos`. "
-            "If omitted, the script will try to infer the current workspace."
-        ),
+        dest="legacy_proposal_dir",
+        help=argparse.SUPPRESS,
     )
     parser.add_argument("--name", required=True)
     parser.add_argument(
@@ -117,23 +125,20 @@ def main() -> None:
         ],
     )
     parser.add_argument("--title")
-    parser.add_argument("--target", default="00-project-description.tex")
+    parser.add_argument("--target", default="current-section-or-slide")
     parser.add_argument("--overwrite", action="store_true")
     args = parser.parse_args()
 
     current_dir = Path.cwd().resolve()
     repo_root = find_repo_root(current_dir)
-    proposal_dir = (
-        resolve_user_path(args.proposal_dir, current_dir, repo_root)
-        if args.proposal_dir
-        else detect_proposal_dir(repo_root, current_dir)
+    workspace_arg = args.workspace_dir or args.legacy_proposal_dir
+    workspace_dir = (
+        resolve_user_path(workspace_arg, current_dir, repo_root)
+        if workspace_arg
+        else detect_workspace_dir(repo_root, current_dir)
     )
-    if proposal_dir is None:
-        raise SystemExit(
-            "Could not infer a proposal workspace. Pass --proposal-dir explicitly."
-        )
-    figure_spec_dir = proposal_dir / "figure-spec"
-    figure_src_dir = proposal_dir / "figure-src"
+    figure_spec_dir = workspace_dir / "figure-spec"
+    figure_src_dir = workspace_dir / "figure-src"
     figure_spec_dir.mkdir(parents=True, exist_ok=True)
     figure_src_dir.mkdir(parents=True, exist_ok=True)
 

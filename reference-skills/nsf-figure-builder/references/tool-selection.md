@@ -4,27 +4,59 @@ Use this file after the figure archetype is clear.
 
 ## Default Rule
 
-Choose the simplest editable format that matches the figure structure.
+Choose the path most likely to yield the best final figure under the user's
+time, revision, and collaboration constraints.
 
-## Preferred Formats
+Do not optimize for a specific file format by default. Optimize for:
 
-### draw.io or SVG
+- visual quality
+- clarity
+- speed to a strong result
+- fit to the target medium
+- enough editability for the actual revision pattern
+
+## Common Paths
+
+### Direct LLM Generation
 
 Best for:
 
-- overview architecture
-- ecosystem diagrams
-- thrust-level mechanism figures
+- polished conceptual overviews
+- visually rich schematics
+- situations where speed and appearance matter more than long-term editability
+- first drafts that may already be good enough as finals
+
+Good choices include image tools from OpenAI, Gemini, Claude, Midjourney,
+Flux, Sora, and similar systems.
+
+Use when:
+
+- the model can plausibly handle the figure's visual complexity
+- the user is comfortable with prompt-driven iteration
+- the figure does not require strict deterministic layout control
+
+### Hybrid LLM Draft Plus Cleanup
+
+Best for:
+
+- high-polish figures with some exact text or layout constraints
+- cases where the model is strong on composition but weak on final labeling
+- workflows where a fast strong draft is more valuable than building from
+  scratch
+
+Cleanup tools can include Figma, PowerPoint, Illustrator, draw.io, or any
+other editor the user already uses.
+
+### Figma / PowerPoint / Illustrator / draw.io
+
+Best for:
+
+- collaborator-facing diagrams
+- architecture and ecosystem figures
 - layered boxes, arrows, actors, and swimlanes
+- cases where medium-term editability matters
 
-Why:
-
-- easy to edit later
-- good collaborator handoff
-- straightforward PDF export
-- supports a middle ground between plain boxes and fully custom illustration
-
-Preferred styling guidance for proposal figures in these formats:
+Useful styling guidance in these tools:
 
 - use grouped background regions rather than only isolated boxes
 - use small icon badges or pictograms when they clarify semantics
@@ -32,13 +64,14 @@ Preferred styling guidance for proposal figures in these formats:
 - avoid the look of a raw slide wireframe unless the user asked for a
   placeholder
 
-### Graphviz
+### Graphviz / Mermaid
 
 Best for:
 
 - typed graphs
 - dependency diagrams
 - asset-linking or relation-heavy figures
+- cases where automatic layout matters more than bespoke visual polish
 
 Why:
 
@@ -49,7 +82,7 @@ Avoid for:
 
 - polished ecosystem art with many custom visual groupings
 
-### matplotlib
+### matplotlib Or Other Plotting Code
 
 Best for:
 
@@ -67,7 +100,7 @@ Why:
 
 Best for:
 
-- LaTeX-native timelines
+- LaTeX-native diagrams or timelines
 - relatively regular technical diagrams
 - cases where reproducible, code-side updates matter more than easy GUI editing
 
@@ -76,27 +109,26 @@ Use cautiously:
 - avoid for highly detailed artistic diagrams
 - avoid when many collaborators need quick manual edits
 
-## Outside Image Tools
+### SVG / PDF / PNG / Other Export Formats
 
-Gemini, Sora, Nano Banana, and similar tools are useful for:
+These are output containers, not primary workflow decisions.
 
-- composition ideas
-- visual mood
-- rough icon or scene inspiration
-
-They are not the preferred source of truth for final proposal figures because
-their outputs are typically raster images that are hard to edit precisely.
-
-Use them as ideation tools, then rebuild the final figure in an editable local
-format.
+- vector export is useful when later editing or crisp scaling matters
+- raster export is acceptable when the figure already looks right and the user
+  does not need heavy downstream editing
+- do not force a vector rebuild just because vector sounds cleaner in theory
 
 ## Quick Decision Guide
 
-- boxes and arrows with collaborators likely to tweak text:
-  choose `draw.io` or `svg`
+- user wants the fastest path to a beautiful figure:
+  start with direct LLM generation
+- model can generate most of the composition, but exact wording will change:
+  choose hybrid draft plus cleanup
+- many collaborators will repeatedly tweak labels and arrows:
+  choose Figma, PowerPoint, Illustrator, or draw.io
 - graph structure matters most:
-  choose `graphviz`
-- chart or timeline driven by data:
-  choose `matplotlib`
+  choose Graphviz or Mermaid
+- chart or timeline is data-driven:
+  choose matplotlib or another plotting library
 - LaTeX-native and moderately structured:
-  choose `tikz`
+  choose TikZ

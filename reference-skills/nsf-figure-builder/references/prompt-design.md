@@ -12,7 +12,7 @@ Keep internal planning separate from the pasted prompt.
 
 ## What A Good Cross-Model Prompt Should Do
 
-A strong prompt for a scientific proposal figure should:
+A strong prompt for a research or technical figure should:
 
 - identify the correct figure archetype from the scientific context
 - state the core message and reviewer takeaway
@@ -36,7 +36,7 @@ Write prompts in this order:
 
 ## Visual Requirements To Reuse
 
-These are strong default requirements for proposal-quality scientific figures:
+These are strong default requirements for polished scientific figures:
 
 - publication-quality scientific figure
 - infer the correct figure type from the scientific context
@@ -46,14 +46,15 @@ These are strong default requirements for proposal-quality scientific figures:
 - use consistent visual encoding across the full figure
 - assign color by functional role, not arbitrarily
 - use a colorblind-friendly palette
-- benchmark against high-end scientific schematics and polished grant figures
+- benchmark against high-end scientific schematics and polished research
+  figures
 - use a white or soft off-white background
 - preserve clean professional typography and clear spatial organization
-- keep the composition modular for later vector editing
+- keep the composition clean enough for optional later editing
 
 ## Output Requirements To Reuse
 
-- readable at proposal half-page to near full-page width
+- readable at the intended final display size
 - large readable labels
 - no tiny dense paragraph text
 - minimal decorative clutter
@@ -72,14 +73,14 @@ Outside image models are weak at dense typography. Default to:
 - concise labels instead of paragraph text
 
 If the user prioritizes beauty over exact wording, tell the model to preserve
-clean label regions that can be refined later in Illustrator.
+clean label regions that can be refined later if needed.
 
 ## Prestige Anchors
 
 If the user wants very polished output, it is acceptable to say:
 
 - benchmark against high-end scientific schematics
-- benchmark against polished grant overview figures
+- benchmark against polished research overview figures
 - benchmark against Nature/Cell-family figure clarity
 
 Translate those anchors into visual properties:

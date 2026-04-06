@@ -121,6 +121,7 @@ def collect_mentions(proposal_dir: Path) -> list[Mention]:
 def collect_team_profiles(
     proposal_dir: Path,
 ) -> tuple[dict[str, TeamProfile], list[dict[str, str]]]:
+    """Scan proposal-level context/team/ for cleaned profiles."""
     team_dir = proposal_dir / "context" / "team"
     profiles: dict[str, TeamProfile] = {}
     issues: list[dict[str, str]] = []
@@ -162,6 +163,25 @@ def collect_team_profiles(
         profiles[name] = TeamProfile(file=relative, name=name)
 
     return profiles, issues
+
+
+def _template_team_names(proposal_dir: Path) -> set[str]:
+    """Return normalized names that have a profile at template level."""
+    repo_root = proposal_dir.parent.parent
+    template_team_dir = repo_root / "template" / "context" / "team"
+    names: set[str] = set()
+    if not template_team_dir.exists():
+        return names
+    for path in sorted(template_team_dir.glob("*/profile.md")):
+        if path.parent.name == "_template":
+            continue
+        text = path.read_text(encoding="utf-8")
+        match = PROFILE_HEADING_RE.search(text)
+        if match:
+            name = normalize_name(match.group("name"))
+            if name and name != "Name":
+                names.add(name)
+    return names
 
 
 def check_institutions(
@@ -214,18 +234,30 @@ def build_report(proposal_dir: Path) -> dict[str, object]:
                 }
             )
 
+    template_names = _template_team_names(proposal_dir)
+
     missing_team_profiles = []
     for canonical in roster.values():
         if canonical.name not in team_profiles:
-            missing_team_profiles.append(
-                {
-                    "name": canonical.name,
-                    "role": canonical.role,
-                    "expected_profile_hint": (
-                        f"context/team/{slugify_name(canonical.name)}/profile.md"
-                    ),
-                }
-            )
+            entry: dict[str, str] = {
+                "name": canonical.name,
+                "role": canonical.role,
+                "expected_profile_hint": (
+                    f"context/team/{slugify_name(canonical.name)}/profile.md"
+                ),
+            }
+            # Template-level fallback only applies to the PI, whose
+            # general profile is maintained at the template level and
+            # shared across proposals.  Co-PI profiles must exist at
+            # the proposal level.
+            if canonical.role == "PI" and canonical.name in template_names:
+                entry["template_fallback"] = (
+                    f"template/context/team/{slugify_name(canonical.name)}/profile.md"
+                )
+                entry["severity"] = "info"
+            else:
+                entry["severity"] = "warning"
+            missing_team_profiles.append(entry)
 
     orphan_team_profiles = []
     for profile in team_profiles.values():

@@ -1,37 +1,42 @@
 ---
-name: nsf-figure-builder
-description: Build NSF proposal figures from proposal text, thrust drafts, and prior example figures. Use when Codex needs to decide whether a proposal or thrust needs a figure, turn a figure idea into a concrete figure spec and caption, prepare a prompt pack for third-party image tools, choose an editable vector format, or reconstruct a collaborator-facing figure workflow that reduces manual PPT or Photoshop work.
+name: figure-prompt-builder
+description: Build copy-ready prompts for downstream LLM figure generation from source text, figure ideas, prior examples, or rough drafts. Use when Codex needs to decide whether a section needs a figure, distill the figure's core message and required visual elements, draft a model-neutral prompt pack for image-generation models, adapt prompts to a requested tool, or recommend limited cleanup after external generation.
 ---
 
-# NSF Figure Builder
+# Figure Prompt Builder
 
 ## Overview
 
-Use this skill when the user wants help with proposal figures beyond a simple
+Use this skill when the user wants help with nontrivial figures beyond a simple
 placeholder.
 
-This skill is optimized for NSF proposal figures, but it can still be reused
-for other calls when the surrounding proposal structure and figure purpose are
-explicit. In those cases, treat the provided call context as the constraint and
-do not force NSF-specific figure assumptions onto the design.
+This skill is not limited to NSF proposals. Treat the surrounding task context
+as the constraint:
 
-This skill is for figure production workflow, not for proposal framing:
+- proposals
+- papers
+- slides
+- posters
+- reports
+- technical docs
+- websites or demos when the figure is the main artifact
 
-- `nsf-proposal-composer` decides whether the proposal-level story needs an
-  overview or ecosystem figure
-- `nsf-thrust-refiner` can suggest a local figure concept and leave a visible
-  placeholder
-- `nsf-figure-builder` turns that need into a reusable figure specification,
-  editable-source plan, and collaboration workflow
+This skill is for prompt-building workflow, not for high-level writing framing:
+
+- adjacent writing skills can decide whether a section needs a figure
+- `figure-prompt-builder` turns that need into a concise figure brief,
+  downstream prompt pack, and limited follow-up guidance
 
 Use it when the user asks for work such as:
 
 - what figure should support this intro or thrust
-- create a figure spec and caption
-- generate a model-neutral prompt for Gemini, Claude, ChatGPT image tools, Sora, Nano Banana, or another outside tool
-- choose between draw.io, SVG, Graphviz, matplotlib, or TikZ
-- reduce hand-drawn PPT or Photoshop work
-- rebuild an outside reference image into a locally editable vector figure
+- create a figure brief, caption, and downstream prompt pack
+- generate a model-neutral prompt for Gemini, Claude, ChatGPT image tools,
+  Sora, Midjourney, Flux, or another outside tool
+- adapt one prompt to a specific downstream model
+- compare prompt strategies for different rendering models
+- decide whether an outside model output needs reprompting, light cleanup, or
+  can be accepted as final
 
 Read these references only as needed:
 
@@ -39,13 +44,15 @@ Read these references only as needed:
 - format and tool choice: `references/tool-selection.md`
 - outside-tool prompt packs and import flow: `references/external-handoff.md`
 - cross-model prompt design for image generation: `references/prompt-design.md`
-- relation to local proposal files: `../nsf-proposal-composer/references/section-blueprints.md`
+- relation to local proposal files when the task is still proposal-bound:
+  `../nsf-proposal-composer/references/section-blueprints.md`
 
-In a multi-proposal repo, use `<proposal-dir>` to mean one concrete proposal
-workspace such as `proposals/nsf-25-533-fairos`.
+In a multi-project repo, use `<work-dir>` to mean the concrete workspace for
+the figure task, such as one proposal folder, one paper folder, or one slide
+deck directory.
 
-Use `scripts/init_figure_spec.py` when the user wants a concrete figure spec
-file scaffold under `<proposal-dir>/figure-spec/`.
+Use `scripts/init_figure_spec.py` when the user wants a concrete local figure
+brief scaffold before writing the final prompt pack.
 
 ## Workflow
 
@@ -53,12 +60,10 @@ file scaffold under `<proposal-dir>/figure-spec/`.
 
 Read the smallest set of files needed to understand the figure's job:
 
-- `<proposal-dir>/00-project-description.tex` for intro and overview figures
-- the target thrust or aim file for unit-level figures
-- `<proposal-dir>/20-evaluation.tex` for timeline or measurable-outcomes figures
+- the target source file for the section, slide, or page the figure supports
+- neighboring text only when needed to understand scope or terminology
+- existing figures only if the user wants a refresh rather than a fresh figure
 - a small number of prior examples from `examples/proposals/`
-- existing figure files under `<proposal-dir>/figure/` only if the user wants a
-  refresh rather than a fresh figure
 
 Do not read the whole repo just to draft one figure.
 
@@ -68,16 +73,16 @@ Add or refresh a figure only when it compresses logic better than prose.
 
 Typical cases:
 
-- intro or overview figure for the end-to-end proposal logic
+- intro or overview figure for the end-to-end project or system logic
 - thrust or aim figure for a pipeline, mechanism, or layered method
 - timeline or work plan figure for evaluation and coordination
-- ecosystem or adoption figure for capability-building proposals
+- ecosystem or adoption figure for capability-building efforts
 - evidence or impact figure when adoption or prior-system footprint matters
 
 If the figure would only restate nearby sentences without clarifying structure,
 say so and avoid unnecessary figure bloat.
 
-### 3. Pick A Figure Archetype Before Picking A Tool
+### 3. Pick A Figure Archetype Before Writing The Prompt
 
 Reduce the request to one archetype first:
 
@@ -88,11 +93,12 @@ Reduce the request to one archetype first:
 5. `ecosystem-or-adoption`
 6. `evidence-or-impact`
 
-Then choose the editable-source format using `references/tool-selection.md`.
+Then choose the downstream generation path using
+`references/tool-selection.md`.
 
-### 4. Produce A Figure Spec First
+### 4. Distill A Figure Brief Before Writing The Prompt
 
-Before proposing final art, produce a figure spec with:
+Before drafting the final prompt, distill a figure brief with:
 
 - figure goal
 - one-sentence reviewer takeaway
@@ -102,21 +108,50 @@ Before proposing final art, produce a figure spec with:
 - suggested layout
 - short in-figure text
 - caption draft
-- recommended editable source format
-- proposed filenames for `figure/` and `figure-src/`
+- recommended downstream generation path
+- recommended file or asset destinations
 
-This spec is the source of truth. Outside-tool drafts are optional aids, not
-the final deliverable.
+This brief is the local source of truth. The prompt pack is the primary
+deliverable for downstream models.
 
 Do not let the figure collapse into a plain box-only wireframe unless the user
-explicitly asks for a minimal placeholder. Proposal-facing figures should use a
-light visual language such as icon badges, grouped regions, or restrained
-illustrative cues when those cues improve readability.
+explicitly asks for a minimal placeholder. When the figure is proposal-facing,
+use a light visual language such as icon badges, grouped regions, or
+restrained illustrative cues when those cues improve readability.
 
-### 5. When Using Outside Image Models, Produce One Prompt The Model Can Actually Use
+### 5. Choose The Downstream Generation Path Before Writing The Prompt
 
-When the user wants to test an outside image model, do not dump the entire
-figure-spec bundle into the model. Produce:
+Do not over-prioritize format purity. First choose the prompt and tool path
+most likely to yield a strong final figure within the user's time, tooling,
+and revision constraints.
+
+Common paths:
+
+1. direct LLM generation as the final deliverable
+2. LLM-generated first draft plus local cleanup
+3. fully local diagramming or code-generated figure
+4. hybrid pipeline with multiple tools
+
+Direct model output is acceptable when:
+
+- the user mainly wants a visually strong figure fast
+- future edits are likely to be minor
+- the model can already deliver good typography and composition for the task
+- exact local editability is less important than final appearance
+
+Prefer editable local sources when:
+
+- many collaborators will revise the figure repeatedly
+- labels or layout will change often with the text
+- the figure encodes precise graph, chart, or workflow logic that benefits from
+  deterministic updates
+
+Once the path is clear, produce one copy-ready prompt pack for that path.
+
+### 6. Format One Prompt The Model Can Actually Use
+
+When the downstream path uses an outside image model, do not dump the entire
+figure brief into the model. Produce:
 
 1. a short local source-of-truth note for the repo
 2. one model-neutral prompt meant to be copied into the outside tool
@@ -143,42 +178,70 @@ Prefer prompts that tell the rendering model:
 - what aesthetics to avoid
 
 Do not ask the rendering model to optimize for the repo's internal workflow.
-That part belongs in the local spec, not in the copied prompt.
+That part belongs in the local brief, not in the copied prompt.
 
-### 6. Support Third-Party Tools Without Depending On Them
+### 7. Support Third-Party Tools Without Depending On Them
 
-When the user wants to use Gemini, Sora, Nano Banana, or similar tools:
+When the user wants to use Gemini, Sora, Midjourney, Flux, or similar tools:
 
-1. convert the figure spec into a clean prompt pack
-2. tell the user exactly what kind of output is acceptable as a reference
+1. convert the figure brief into a clean prompt pack
+2. tell the user whether the expected output is:
+   - a reference draft
+   - a near-final candidate
+   - an acceptable final deliverable
 3. if the returned asset should stay in the repo, place it under
-   `<proposal-dir>/figure-src/reference/`
-4. treat those assets as inspiration or layout references
-5. rebuild the final figure in an editable vector format
+   `<work-dir>/figure-src/reference/` or another agreed local folder
+4. treat those assets as inspiration, a draft, or a final candidate depending
+   on the task
+5. if the first output is close but not right, reprompt with delta feedback
+   before escalating to cleanup or rebuild
+6. rebuild or clean up locally only when the figure quality or editability
+   still falls short
 
-Do not treat a returned raster image as the long-term source of truth unless
-the user explicitly accepts that tradeoff.
+When reprompting a close-but-not-right draft:
 
-### 7. Default To Editable Outputs
+- explicitly keep the parts that already work
+- describe only the deltas that must change
+- change one to three dimensions at a time unless the concept is fundamentally
+  wrong
+- restart from the original brief when repeated delta prompts are drifting or
+  contradicting each other
 
-Prefer workflows that leave the user with editable local source files:
+Useful delta instructions include:
 
-- `drawio` or `svg` for architecture and ecosystem figures
-- `graphviz` for graphs, dependency diagrams, and typed relationships
-- `matplotlib` for charts or simpler timelines
-- `tikz` only when LaTeX-native generation materially helps and the expected
-  complexity is manageable
+- keep the current layered layout but enlarge all labels by 20%
+- preserve the left-to-right flow and simplify the icon set
+- keep the composition and color roles, but make the causal arrows explicit
+- keep the overall structure and replace decorative art with cleaner schematics
 
-For complex figures, it is acceptable to produce:
+Do not force a rebuild just because the output is raster or not locally
+editable. Rebuild only when the figure still fails the user's actual quality or
+maintenance needs.
 
-- a strong figure spec
-- a prompt pack for outside ideation
-- an editable skeleton rather than a fully polished final figure
+### 8. Treat Editability As A Decision Variable, Not A Hard Rule
 
-The goal is to remove most manual figure-design labor, not to promise
-fully automatic artistic finish.
+Editable local sources are sometimes helpful, but they are secondary here.
+Recommend them only when they materially improve iteration or reuse.
+Otherwise, optimize for a strong prompt and final figure quality.
 
-When drafting editable skeletons:
+Possible outputs include:
+
+- direct image-model output
+- Figma or PowerPoint source
+- draw.io or SVG
+- Graphviz or Mermaid source
+- matplotlib or another plotting script
+- TikZ when LaTeX-native generation helps
+- hybrid source plus exported PDF or PNG
+
+For complex figures, it is still acceptable to produce:
+
+- a strong figure brief
+- a prompt pack for outside generation
+- a local cleanup plan
+- a skeletal editable source when fully polished auto-generation is unrealistic
+
+When drafting local skeletons or cleanup plans:
 
 - avoid crude box farms unless structure is the only goal
 - route arrows deliberately; avoid diagonals that create visual confusion
@@ -186,20 +249,21 @@ When drafting editable skeletons:
   clutter
 - keep in-figure text short enough that later style polishing remains easy
 
-### 8. Write Outputs Into Stable Locations
+### 9. Write Outputs Into Stable Locations When The Workspace Has Them
 
 Use these repo locations:
 
-- `<proposal-dir>/figure-spec/` for figure specs and prompt packs
-- `<proposal-dir>/figure-src/` for editable local sources
-- `<proposal-dir>/figure/` for final exported PDFs
-- `<proposal-dir>/figure-src/reference/` for external reference images or drafts
+- `<work-dir>/figure-spec/` for figure briefs and prompt packs
+- `<work-dir>/figure-src/` for editable local sources or intermediate assets
+- `<work-dir>/figure/` for final exported assets
+- `<work-dir>/figure-src/reference/` for external reference images or drafts
 
-When working on the long-lived template instead of an active proposal, use the
-same folder names under `template/`.
+When the workspace does not already use these folders, create only the folders
+that materially help organization. Do not force repo-specific directories onto
+a task that only needs one prompt file or one final image.
 
 When the user explicitly wants an outside-model prompt, save a dedicated prompt
-file under `<proposal-dir>/figure-spec/` with a stable name such as
+file under `<work-dir>/figure-spec/` with a stable name such as
 `<figure-name>-universal-prompt.md`. Keep the file easy to copy:
 
 - short title
@@ -211,11 +275,12 @@ file under `<proposal-dir>/figure-spec/` with a stable name such as
 When using this skill, prefer one of these outcomes:
 
 - a figure recommendation with rationale and no new file
-- a figure spec and caption draft
-- a figure spec plus a prompt pack for outside tools
+- a figure brief and caption draft
+- a figure brief plus a prompt pack for outside tools
 - a prompt-only file meant to be pasted into an external image model
-- a figure spec plus editable-source recommendation and filenames
-- a refresh plan for rebuilding an outside draft into a local editable figure
+- a prompt pack plus generation-path recommendation and filenames
+- a prompt pack plus follow-up guidance for improving an outside draft
 
-Keep the output practical. The main value is reducing manual figure work while
-keeping the resulting assets editable and proposal-aligned.
+Keep the output practical. The main value is reducing manual figure-design work
+while making it easier to get to a strong downstream prompt and a strong final
+figure.

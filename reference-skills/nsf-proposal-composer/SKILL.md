@@ -40,8 +40,8 @@ technical deepening, local evaluation hooks, or figure thinking inside a single
 unit, prefer `nsf-thrust-refiner` instead of stretching this skill beyond
 structure and cross-section sync.
 
-When the user wants an actual proposal-figure workflow, editable-source plan,
-or outside-tool prompt pack, prefer `nsf-figure-builder`.
+When the user wants an actual proposal-figure prompt workflow, a figure brief,
+or an outside-tool prompt pack, prefer `figure-prompt-builder`.
 
 Do not mimic old proposal wording. Abstract structure, decision patterns,
 argument flow, and section slotting from prior examples.
@@ -93,6 +93,14 @@ Read the smallest set of inputs that will support drafting:
   `<proposal-dir>/context/team/*/cv.pdf`,
   `<proposal-dir>/context/team/*/webpage.txt`,
   `<proposal-dir>/context/notes/*.md`
+- PI core materials under `template/context/team/` (auto-synced from
+  external sources). These contain canonical raw assets such as
+  `cv-full.tex`, `publications.json`, `open-source.json`, `bio.txt`, and
+  `yue-zhao.bib` that are shared across all proposals. When a proposal-level
+  `context/team/<person>/profile.md` exists, treat it as the
+  proposal-specific overlay (Project Role, Writing Notes, Prior
+  Collaboration) and merge it with the template-level general profile and
+  raw assets.
 - The long-lived fallback template under `template/` when no active proposal
   folder exists yet
 - Prior examples under `examples/proposals/` when the user wants style or
@@ -297,18 +305,30 @@ Default slots:
 - `<proposal-dir>/context/solicitation/`: raw solicitation materials for guardrail ingest
 - `<proposal-dir>/context/team/`: PI source materials used to draft or refresh team qualification text
 - `<proposal-dir>/context/notes/`: active-project notes that may influence framing decisions
+- `<proposal-dir>/letters/`: letters of collaboration or support (signed PDFs from
+  collaborators). Reusable Word templates in `template/letters/`; default to the
+  collaboration template unless the solicitation explicitly requires support letters
 
 For `ecosystem-building`, it is acceptable to reinterpret `aim` files as
 `work packages`, `thrusts`, or `capability tracks` if that better fits the call.
 
 For team-qualification work, use this sub-workflow:
 
-1. read `context/team/<person>/profile.md` if present
-2. otherwise extract facts from `html`, `txt`, `scholar`, and `cv.pdf` inputs
-3. draft or refresh `03-team-qualification.tex`
-4. if citations or affiliations are not final, leave visible `\todo{...}`
+1. read `template/context/team/<person>/profile.md` for general facts
+   (role, education, grants, publications, open-source impact, lab) and
+   raw assets (`cv-full.tex`, `publications.json`, `open-source.json`,
+   `bio.txt`, `yue-zhao.bib`) when available
+2. read `<proposal-dir>/context/team/<person>/profile.md` for
+   proposal-specific context (Project Role, Writing Notes, Prior
+   Collaboration with this team)
+3. merge: template-level general facts + proposal-level overlay; the
+   proposal-level profile wins on any conflicting field
+4. if neither level has a cleaned profile, extract facts from `html`,
+   `txt`, `scholar`, and `cv.pdf` inputs
+5. draft or refresh `03-team-qualification.tex`
+6. if citations or affiliations are not final, leave visible `\todo{...}`
    markers in the LaTeX
-5. ensure role, name, and institution references remain consistent with
+7. ensure role, name, and institution references remain consistent with
    `30-collaborators.tex`, `20-evaluation.tex`, and `34-facility.tex`
 
 ### 7. Refresh Cross-Section Consistency
