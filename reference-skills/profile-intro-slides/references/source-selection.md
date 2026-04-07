@@ -4,28 +4,28 @@ Use website-first sources by default. This skill is meant to preserve the curren
 
 ## Primary Sources
 
-- `yzhao062.github.io/files/bio.txt`
+- `jyzhao.net/files/bio.txt`
   - Best source for polished personal positioning, affiliation, and compact impact summary.
-- `yzhao062.github.io/index.html`
+- `jyzhao.net/index.html`
   - Best source for the current research summary and the three main research directions.
-- `yzhao062.github.io/lab.html`
+- `jyzhao.net/lab.html`
   - Best source for the FORTIS expansion, mission statement, and lab-level framing.
-- `yzhao062.github.io/data/open-source.json`
+- `jyzhao.net/data/open-source.json`
   - Best source for representative systems, project roles, and project-level impact signals.
-- `yzhao062.github.io/data/publications.json`
+- `jyzhao.net/data/publications.json`
   - Best source for representative recent papers and direction coverage.
 
 ## Secondary Sources
 
-- `yzhao062.github.io/data/lab-current-phd.json`
+- `jyzhao.net/data/lab-current-phd.json`
   - Use when a slide needs limited evidence of lab scope or trainee profile.
-- `yzhao062.github.io/data/lab-members.json`
+- `jyzhao.net/data/lab-members.json`
   - Use sparingly for lab breadth, student outcomes, or mentorship evidence.
-- `yzhao062.github.io/files/ZHAO_YUE_CV.pdf`
+- `jyzhao.net/files/ZHAO_YUE_CV.pdf`
   - Use only to fill gaps such as awards, service, or older history.
-- `yzhao062.github.io/images/rsz_250.jpg`
+- `jyzhao.net/images/rsz_250.jpg`
   - Preferred portrait unless the user asks for a different image.
-- `yzhao062.github.io/images/lab-logo.png`
+- `jyzhao.net/images/lab-logo.png`
   - Preferred lab mark.
 
 ## Omit By Default

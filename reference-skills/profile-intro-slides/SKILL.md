@@ -18,7 +18,7 @@ This skill is repo-specific. Treat these paths as relative to the workspace root
 - `README.md`
 - `theme/`
 - `templates/`
-- `yzhao062.github.io/`
+- `jyzhao.net/`
 
 Before generating anything, verify that the workspace contains at least:
 
@@ -26,19 +26,19 @@ Before generating anything, verify that the workspace contains at least:
 - `templates/demo.tex`
 - `templates/paper-deck-base.tex`
 - `theme/beamerthemeuscmoloch.sty`
-- `yzhao062.github.io/index.html`
-- `yzhao062.github.io/lab.html`
-- `yzhao062.github.io/files/bio.txt`
-- `yzhao062.github.io/data/open-source.json`
-- `yzhao062.github.io/data/publications.json`
+- `jyzhao.net/index.html`
+- `jyzhao.net/lab.html`
+- `jyzhao.net/files/bio.txt`
+- `jyzhao.net/data/open-source.json`
+- `jyzhao.net/data/publications.json`
 
 Useful optional sources:
 
-- `yzhao062.github.io/data/lab-current-phd.json`
-- `yzhao062.github.io/data/lab-members.json`
-- `yzhao062.github.io/files/ZHAO_YUE_CV.pdf`
-- `yzhao062.github.io/images/rsz_250.jpg`
-- `yzhao062.github.io/images/lab-logo.png`
+- `jyzhao.net/data/lab-current-phd.json`
+- `jyzhao.net/data/lab-members.json`
+- `jyzhao.net/files/ZHAO_YUE_CV.pdf`
+- `jyzhao.net/images/rsz_250.jpg`
+- `jyzhao.net/images/lab-logo.png`
 
 If the contract is not satisfied, stop and ask the user instead of improvising a different source stack.
 
