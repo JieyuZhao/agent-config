@@ -104,7 +104,7 @@ Skills come from two sources with different availability:
 | `skills/` (shared) | All projects | Copied by bootstrap into `.agent-config/repo/skills/` |
 | `reference-skills/` (domain) | Only projects that have them locally | Copied manually into `skills/` in the project repo |
 
-Before invoking a reference skill, check that its `SKILL.md` exists in the current project (either `skills/` or `.agent-config/repo/skills/`). If it does not exist, inform the user: "This task would use [skill name], but it is not available in this project. You can copy it from https://github.com/yzhao062/agent-config/tree/main/reference-skills/."
+Before invoking a reference skill, check that its `SKILL.md` exists in the current project (either `skills/` or `.agent-config/repo/skills/`). If it does not exist, inform the user: "This task would use [skill name], but it is not available in this project. You can copy it from https://github.com/JieyuZhao/agent-config/tree/main/reference-skills/."
 
 ## Combining with Dual-Pass Workflow
 

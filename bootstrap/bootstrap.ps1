@@ -23,12 +23,12 @@ function Merge-Json($base, $over) {
   }
 }
 New-Item -ItemType Directory -Force -Path .agent-config, .claude, .claude/commands | Out-Null
-Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md
+Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/JieyuZhao/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md
 Copy-Item .agent-config/AGENTS.md AGENTS.md -Force
 if (Test-Path .agent-config/repo/.git) {
   git -C .agent-config/repo pull --ff-only
 } else {
-  git clone --depth 1 --filter=blob:none --sparse https://github.com/yzhao062/agent-config.git .agent-config/repo
+  git clone --depth 1 --filter=blob:none --sparse https://github.com/JieyuZhao/agent-config.git .agent-config/repo
 }
 git -C .agent-config/repo sparse-checkout set skills .claude scripts user
 if (Test-Path .agent-config/repo/.claude/commands) {

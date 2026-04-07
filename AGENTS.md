@@ -5,7 +5,7 @@
 
 ## Bootstrap: Shared Config and Skills
 
-This file is the shared agent configuration hosted at `https://github.com/yzhao062/agent-config`.
+This file is the shared agent configuration hosted at `https://github.com/JieyuZhao/agent-config`.
 Project repos should include the following bootstrap block in their own `AGENTS.md` so that agents automatically pull the latest shared defaults and skills before starting any task.
 
 ### Bootstrap block for project repos
@@ -21,7 +21,7 @@ PowerShell (Windows):
 
 ```powershell
 New-Item -ItemType Directory -Force -Path .agent-config, .claude, .claude/commands | Out-Null
-Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.ps1 -OutFile .agent-config/bootstrap.ps1
+Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/JieyuZhao/agent-config/main/bootstrap/bootstrap.ps1 -OutFile .agent-config/bootstrap.ps1
 & .\.agent-config\bootstrap.ps1
 ```
 
@@ -29,7 +29,7 @@ Bash (macOS/Linux):
 
 ```bash
 mkdir -p .agent-config .claude/commands
-curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh
+curl -sfL https://raw.githubusercontent.com/JieyuZhao/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh
 bash .agent-config/bootstrap.sh
 ```
 
