@@ -1,6 +1,6 @@
 ---
 name: ci-mockup-figure
-description: Create space-efficient figures by building interactive HTML mockups of systems, methodological flowcharts, dashboards, and timelines, then capturing landscape screenshots. The primary goal is maximizing information per page — every figure must earn its space. Use for papers, proposals, or any document that needs credible figures (system interfaces, method pipelines, architectural flowcharts) instead of generic diagrams.
+description: Create space-efficient figures for papers and proposals. HTML mockups for systems, dashboards, and timelines; TikZ or skia-canvas for abstract diagrams with arrow routing. Covers tool selection, design, capture, and LaTeX insertion. The primary goal is maximizing information per page — every figure must earn its space.
 ---
 
 # CI Mockup Figure
@@ -9,8 +9,15 @@ description: Create space-efficient figures by building interactive HTML mockups
 
 The goal is **space-efficient, information-dense figures** that communicate
 a system's design, a method's pipeline, or an architectural flowchart in
-minimal page area. The method: build an interactive HTML mockup, capture
-horizontal screenshots, insert as compact wrapfigures or subfloat grids.
+minimal page area. Two paths depending on figure type:
+
+- **HTML mockup path** (Phases 1-4 below): for UI mockups, dashboards,
+  timelines, and any figure where content is rectangular with no cross-node
+  arrows. Build interactive HTML, capture screenshots, insert into LaTeX.
+- **Abstract figure path** (Abstract Figure Toolchain section): for
+  architecture overviews, dependency topologies, and any figure needing
+  arrow routing between non-adjacent nodes. Use TikZ, skia-canvas, or
+  Illustrator ExtendScript.
 
 Every figure must pass the space test: does this figure communicate more per
 square inch than the text it displaces? If a full-width figure takes half a
@@ -27,9 +34,8 @@ and reviewers evaluate whether the design is credible and well-conceived.
 
 ### HTML mockups vs TikZ/LaTeX diagrams
 
-HTML mockups are preferred over TikZ for most flowcharts, pipelines, and
-system diagrams. TikZ tends to produce dated, rigid-looking output and is
-harder to iterate on.
+HTML and TikZ each have a clear strength. The deciding factor is **whether
+the figure needs arrow routing between non-adjacent nodes**.
 
 | | HTML mockup | TikZ |
 |---|---|---|
@@ -38,12 +44,23 @@ harder to iterate on.
 | Layout control | Flexbox/grid, responsive | Manual coordinate math |
 | Color/font variety | Full CSS + web fonts | Limited, verbose color defs |
 | Interactivity | View switching, capture mode | Static only |
+| **Arrow routing** | **Breaks on cross-row/non-adjacent nodes** | **Node anchoring solves this natively** |
+| Font matching | Separate from LaTeX | Perfect match with document body |
 
-**Prefer HTML** for system mockups, method pipelines, flowcharts, dashboards,
-and Gantt/timeline figures. **TikZ is fine** for small inline diagrams that
-must live inside the LaTeX source (e.g., a commutative diagram in math, a
-small decision tree) or when exact font matching with the document body is
-critical.
+**Prefer HTML** for system mockups, dashboards, Gantt/timeline figures, and
+any figure where the content is inherently rectangular and flows naturally
+(no cross-node arrows needed).
+
+**Prefer TikZ** for abstract framework diagrams, dependency topologies, and
+architecture overviews where arrows must route between non-adjacent nodes
+(L-shaped, curved, crossing rows). TikZ node anchoring (`node.south`,
+`node.east`) handles this natively. Also prefer TikZ for small inline
+diagrams that must live inside the LaTeX source or when exact font matching
+is critical.
+
+**Prefer skia-canvas** (Node.js) when you need the arrow-routing control of
+TikZ but want faster iteration (edit `.mjs`, run, get PDF) and richer
+visual styling than TikZ provides.
 
 ### HTML mockups vs AI image generation
 
@@ -83,11 +100,97 @@ HTML is also better than PPTX for Gantt/timeline figures:
 - The document has a page limit and figures need to be space-efficient
 - A timeline/Gantt figure is needed for the work plan or project overview
 
-### When NOT to Use
+### When NOT to Use (either path)
 
 - **Experimental result figures** (plots, charts, tables, ablation curves) --
   use Python (matplotlib, seaborn, plotly) or LaTeX (pgfplots, tikz) instead.
   This skill is for system/method diagrams, not data visualization.
+
+### When to Use the Abstract Path Instead of HTML
+
+- **Abstract framework diagrams with cross-node arrow routing** --
+  dependency topologies, architecture overviews with curved arrows between
+  non-adjacent nodes, box-and-arrow conceptual figures. HTML/CSS fails at
+  arrow routing: JS-positioned SVG arrows drift and misalign, CSS
+  pseudo-element arrows work only for simple adjacent connections, and card
+  grid layouts read as a product dashboard, not a research diagram. Use the
+  Abstract Figure Toolchain section below.
+
+## Abstract Figure Toolchain
+
+When the figure is NOT a UI mockup, dashboard, or timeline (i.e., it needs
+arrows between nodes, dependency edges, or architectural flow), HTML/CSS is
+the wrong tool. The core problem: **arrow routing is the bottleneck**, not
+box/text rendering. Any tool with node-anchor-based arrow endpoints works;
+any tool relying on CSS layout for arrow positioning will struggle.
+
+### What fails in HTML/CSS for abstract diagrams
+
+| Problem | Why |
+|---|---|
+| Curved arrows between components | Requires absolute-positioned SVG overlay that fights CSS layout |
+| External screenshots as hero images | Multi-panel screenshots break `object-fit: cover` and explode containers |
+| Card grid layout | Reads as a product dashboard, not a research diagram |
+| Print fidelity | Browser print rescales unpredictably for non-page layouts |
+| Emoji/icons for decoration | Instantly makes the figure look unprofessional |
+
+### Recommended tools (ranked by context)
+
+| Context | Tool | Why |
+|---|---|---|
+| LaTeX paper, arrow-heavy | **TikZ** | Node anchoring (`node.south`, `node.east`) handles arrow routing natively. Font/style consistency with the paper is free. Academic gold standard. |
+| Programmatic iteration needed | **skia-canvas** (Node.js) | Same Canvas API as HTML but headless, with direct PDF/SVG vector export. Edit coordinates in `.mjs`, run `node script.mjs`, get PDF. No browser, no capture, no pdfcrop. |
+| Final hand-polish needed | **Illustrator ExtendScript** (`.jsx`) | Generate programmatically, then hand-adjust. Best for figures that need to look "designed." Requires Illustrator. |
+| Python-only environment | **drawsvg** (`pip install drawsvg`) | SVG-first imperative drawing. For PDF, convert the output SVG externally (e.g., Inkscape CLI or `cairosvg`, which needs the Cairo C library and is tricky on Windows). |
+
+**Not recommended:** D2 (auto layout too unpredictable for precise academic
+figures), Graphviz (limited custom styling), matplotlib (designed for data
+plots, not diagrams).
+
+### skia-canvas workflow
+
+A parallel capture path to the HTML workflow, for abstract figures:
+
+```bash
+npm install skia-canvas
+# edit generate-figure.mjs (Canvas API: ctx.roundRect, ctx.fillText, ctx.lineTo)
+node generate-figure.mjs
+# outputs figure.pdf (vector), figure.svg, figure.png
+# use figure.pdf directly in \includegraphics — no pdfcrop needed
+```
+
+Script structure pattern:
+```
+gen_overview.mjs
+├── helpers: roundRect(), text(), drawArrow(), drawImage()
+├── layout constants: W, H, panel positions, gap sizes
+├── draw():
+│   ├── header bar (title + thumbnails)
+│   ├── component panels (frame + internal diagram + footer)
+│   ├── inter-component arrows with labeled handoffs
+│   └── bottom strip (use cases + running example)
+└── export: PDF + PNG preview
+```
+
+Adjust coordinates, rerun, get new PDF instantly. No browser, no print quirks.
+
+### Design principles for abstract/architecture figures
+
+1. **No external screenshots in component panels.** Draw diagrams
+   programmatically (nodes, edges, flow stages). Screenshots are not made
+   for your figure's aspect ratio and will break.
+2. **Real images only in grounding areas** (use case strips, running example
+   ribbons) where they are decorative context, not structural elements.
+3. **Horizontal layout for pipeline figures** (T1 -> T2 -> T3 left-to-right).
+   Vertical stacking wastes landscape width.
+4. **Minimal elements per panel**: badge, title, one diagram, short
+   description, one output line.
+5. **Light tint fills** (`rgba(..., 0.06-0.08)`), thick top-border accent
+   per component. No saturated card backgrounds, no shadows, no pills/chips.
+6. **Inter-component arrows with labeled handoffs** (e.g., "Asset Graph",
+   "Discovery Trace") as explicit connectors, not just whitespace.
+7. **Professional typography**: system sans-serif (Segoe UI, Arial) or serif
+   (Georgia). Never playful fonts. No emoji.
 
 ## Space Budget (decide first)
 
@@ -262,21 +365,28 @@ For work plan timeline figures, use a standalone HTML file with CSS grid.
 
 ## Phase 3: Review with Codex
 
-Use the `implement-review` skill to send the staged mockup to Codex for review.
-Key review points:
+Use the `implement-review` skill to send the staged figure to Codex for review.
+Key review points (apply to both HTML and abstract paths):
 
 1. **Scientific accuracy** — are dataset names, diagnostics, and workflow steps
    plausible for the target domain?
-2. **Visual differentiation** — do the thrust views look distinct?
+2. **Visual differentiation** — do the component views look distinct?
 3. **Legibility at print size** — will fonts survive at `0.55\textwidth`?
 4. **Branch coverage** — if the system has multiple modes (e.g., zero-vehicle
    vs HV-owning), does the caption explicitly label which branch is shown?
 5. **Figure cross-references** — every figure must have a `Figure~\ref{}`
    callout in the prose. Figures without cross-references feel decorative.
 
+Additional review points for the **abstract path**:
+6. **Arrow routing** — do all arrows connect at correct node anchors? No
+   floating or misaligned endpoints.
+7. **No dashboard aesthetic** — the figure should read as a research diagram,
+   not a product UI.
+8. **Vector output** — PDF/SVG output is vector, not rasterized.
+
 Iterate based on feedback. Typical: 2-3 rounds.
 
-## Phase 4: Capture and Insert
+## Phase 4: HTML Capture and Insert
 
 ### Capture workflow
 
@@ -364,14 +474,24 @@ multiple national-priority domains"):
 
 ## Output Checklist
 
+### HTML mockup path
 - [ ] HTML mockup(s) in `figure-src/` with all assets in `figure-src/assets/`
 - [ ] Separate HTML files for system mockup vs timeline (not combined)
 - [ ] View-switching buttons for multi-interface systems
 - [ ] Print preview tested — text wraps, no truncation, landscape orientation
 - [ ] Screenshot PNG/PDF files in `figure/` (originals kept, trimmed copies via `pdfcrop`)
+
+### Abstract figure path
+- [ ] Generation script (`.mjs` for skia-canvas, `.tex` for TikZ, `.jsx` for Illustrator) in `figure-src/`
+- [ ] Vector output (PDF/SVG) in `figure/` — no browser capture needed
+- [ ] Arrow endpoints anchored to correct node edges, no drift
+- [ ] No dashboard aesthetic (no card shadows, no pills/chips, no emoji)
+- [ ] Professional typography (system sans-serif or serif, no playful fonts)
+
+### Both paths
 - [ ] `wrapfigure` (0.55–0.56) or `figure[t]` environments in tex files
 - [ ] `Figure~\ref{}` callouts in the prose for every figure
 - [ ] Captions describing visible content with explicit branch/mode labeling
-- [ ] Legend swatches match actual bar/card colors in the mockup
+- [ ] Legend swatches match actual bar/card colors in the figure
 - [ ] Bib entries for any cited data products (NASA, USGS, etc.)
 - [ ] Codex review passed (scientific accuracy, legibility, differentiation)
