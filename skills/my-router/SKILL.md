@@ -41,7 +41,7 @@ The user's prompt often contains the clearest signal. Match keywords to skills:
 |---|---|---|
 | "cite", "citation", "bibliography", "bib", "references" | `bibref-filler` (or local variant like `nsf-bibref-filler` if available) | `skills/` (shared), check local first |
 | "figure", "diagram", "illustration", "schematic", "overview figure" | `figure-prompt-builder` | `skills/` (shared) |
-| "mockup", "HTML figure", "HTML mockup", "interactive figure", "dashboard mockup", "Gantt", "screenshotable figure", "capture mode" | `ci-mockup-figure` | `skills/` (shared) |
+| "mockup", "HTML figure", "HTML mockup", "interactive figure", "dashboard mockup", "Gantt", "screenshotable figure", "capture mode", "skia-canvas", "TikZ figure", "arrow routing" | `ci-mockup-figure` | `skills/` (shared) |
 | "review staged", "review changes", "review the diff" | `implement-review` | `skills/` (shared) |
 | "two-pass", "first pass", "second pass", "audit" | `dual-pass-workflow` | `skills/` (shared) |
 | "proposal", "nsf", "nih", "grant", "solicitation", "aim", "thrust" | Proposal skills (check for local `nsf-*`, `nih-*` skills first) | `reference-skills/` (project-local) |
