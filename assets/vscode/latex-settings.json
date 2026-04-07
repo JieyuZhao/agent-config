@@ -1,0 +1,43 @@
+{
+  // === 编译 ===
+  "latex-workshop.latex.autoBuild.run": "onSave",
+  // "latex-workshop.latex.autoBuild.run": "never",
+  "latex-workshop.latex.outDir": "./out",
+  "latex-workshop.latex.clean.fileTypes": [
+    "*.aux", "*.bbl", "*.blg", "*.idx", "*.ind", "*.lof", "*.lot",
+    "*.out", "*.toc", "*.acn", "*.acr", "*.alg", "*.glg", "*.glo",
+    "*.gls", "*.ist", "*.fls", "*.log", "*.fdb_latexmk", "*.synctex.gz"
+  ],
+  "latex-workshop.latex.rootFile.useSubFile": true,
+
+  // === 工具 ===
+  "latex-workshop.latex.tools": [
+    {
+      "name": "latexmk",
+      "command": "latexmk",
+      "args": [
+        "-pdf", "-interaction=nonstopmode", "-synctex=1",
+        "-file-line-error", "-outdir=%OUTDIR%", "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    { "name": "latexmk", "tools": ["latexmk"] }
+  ],
+
+  // === 自动清理 ===
+  "latex-workshop.latex.autoClean.run": "onBuilt",
+  "latex-workshop.latex.clean.enabled": true,
+
+  // === PDF 预览 ===
+  "latex-workshop.view.pdf.viewer": "tab",
+  "latex-workshop.synctex.afterBuild.enabled": true,
+
+  // === IntelliSense ===
+  "latex-workshop.intellisense.package.enabled": true,
+  "latex-workshop.intellisense.citation.backend": "bibtex",
+
+  // === 日志优化 ===
+  "latex-workshop.message.log.show": false,
+  "latex-workshop.latex.log.ignore": ["Underfull", "Overfull"]
+}

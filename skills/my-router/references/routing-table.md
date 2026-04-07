@@ -22,6 +22,7 @@
 | `nsf-thrust-refiner` | NSF thrust/aim polishing | Technical depth patterns, figure patterns, quality checklist |
 | `nsf-proposal-guardrail` | NSF compliance checking | Solicitation parsing, template mapping, output schema |
 | `nsf-figure-builder` | NSF-specific figures | Figure archetypes and tool selection for proposals |
+| `proposal-reviewer` | Proposal content review (any sponsor) | Intent fit, challenge clarity, differentiation, structural alignment, scoring |
 
 ### Paper and Review
 
@@ -29,6 +30,7 @@
 |---|---|---|
 | `cs-paper-review` | Peer review of CS papers | Venue-specific review criteria (NeurIPS, ICML, ACL, etc.) |
 | `cs-meta-review` | Area chair decisions | Meta-review criteria across venues |
+| `paper-improve` | Paragraph-level writing diagnosis and rewrite | Claim/logic/evidence/scope/cohesion diagnosis + rewrite with change log |
 
 ### Presentations
 

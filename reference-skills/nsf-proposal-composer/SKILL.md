@@ -62,6 +62,8 @@ Read these references only as needed:
 - Intro-to-aim sync workflow: `references/intro-aim-sync.md`
 - Edit boundaries between composer and refiner:
   `references/edit-boundaries.md`
+- Argument quality conventions (challenge, differentiation, subsection
+  motivation, section annotation): `references/drafting-rules.md`
 
 `nsf-proposal-composer` owns the default heading style for proposal sections.
 When it creates or refreshes `\section{}`, `\subsection{}`, or

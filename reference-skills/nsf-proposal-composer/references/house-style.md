@@ -77,3 +77,18 @@ management notes.
 
 Compress to 3 units only when the idea is materially simpler than the user's
 usual proposal pattern.
+
+## Research Direction Paragraphs (Theoretical Sections)
+
+In theoretical or mechanism-heavy sections, after the major body paragraph add
+a named direction paragraph:
+
+```latex
+\paragraph{Direction N --- [Descriptive Name].} ...
+```
+
+The paragraph should cover in 2–3 sentences: what will be done, why it will
+work, and what a positive result looks like. The title must be descriptive —
+`Direction 1.` alone is not acceptable. Use this pattern only in sections where
+the work is framed as a research direction rather than a concrete task or
+subtask.

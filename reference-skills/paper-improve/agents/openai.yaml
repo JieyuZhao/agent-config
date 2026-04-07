@@ -1,0 +1,4 @@
+interface:
+  display_name: "Paper Improve"
+  short_description: "Diagnose and rewrite academic paragraphs for clarity, logic, and precision"
+  default_prompt: "Use $paper-improve to diagnose the paragraph I just shared — identify claim, logic, evidence, scope, and cohesion issues — then produce a rewritten version with a change log explaining each edit."
