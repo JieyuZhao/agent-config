@@ -27,15 +27,7 @@
       "Bash(git branch --delete *)"
     ],
     "additionalDirectories": [
-      "C:\\Users\\yuezh\\PycharmProjects",
-      "C:\\Users\\yzhao062\\PycharmProjects",
-      "C:\\Users\\csadmin\\PycharmProjects",
-      "/Users/yuezh/PycharmProjects",
-      "/Users/yzhao062/PycharmProjects",
-      "/Users/csadmin/PycharmProjects",
-      "/home/yuezh/PycharmProjects",
-      "/home/yzhao062/PycharmProjects",
-      "/home/csadmin/PycharmProjects"
+      "/Users/veyron/Documents/Projects"
     ]
   },
   "hooks": {
