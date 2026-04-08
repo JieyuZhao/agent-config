@@ -1,36 +1,31 @@
 ---
 name: implement-review
-description: Review loop for staged changes. Detects content type, prepares a review request for Codex (MCP, terminal, or plugin), categorizes feedback, revises, and iterates. Works for code, papers, proposals, or any text-based output.
+description: Review loop for staged changes. Detects content type, prepares a review request for Codex (terminal or plugin), categorizes feedback, revises, and iterates. Works for code, papers, proposals, or any text-based output.
 ---
 
 # Implement-Review
 
 ## Overview
 
-A review loop for staged changes. Claude Code detects the content type, sends the changes to Codex for review, categorizes the feedback, revises, and iterates. Works through three Codex channels: MCP (macOS/Linux default), terminal relay (Windows default), or IDE plugin.
+A review loop for staged changes. Claude Code detects the content type, sends the changes to Codex for review, categorizes the feedback, revises, and iterates. Works through two Codex channels: terminal relay (default on all platforms) or IDE plugin.
 
 ## Codex Channels
 
-Three paths to Codex are supported. The skill picks the best available path automatically.
+Two paths to Codex are supported. The skill picks the best available path automatically.
 
-### MCP path (macOS / Linux default)
+### Terminal path (default)
 
-Codex is registered as an MCP server (`codex` and `codex-reply` tools available). Claude Code calls `codex` directly with the review request and reads the response as a tool result. No user relay needed.
+The user has a Codex interactive terminal window open alongside Claude Code. Claude Code prepares a copy-pasteable review prompt (summary, diff, lens, round number) and presents it as a fenced text block. The user copies it into the Codex terminal, then relays the feedback back to Claude Code.
 
 ### Plugin path (IDE sidebar)
 
 Codex runs as an IDE plugin with direct access to the repo. The user tells Codex to review in the plugin sidebar (e.g., "review the staged changes"). Codex can see the working tree and run `git diff` itself, so no diff needs to be copy-pasted. The user relays Codex's feedback back to Claude Code.
 
-### Terminal path (Windows default)
-
-The user has a Codex interactive terminal window open alongside Claude Code. Claude Code prepares a copy-pasteable review prompt (summary, diff, lens, round number) and presents it as a fenced text block. The user copies it into the Codex terminal, then relays the feedback back to Claude Code. This avoids the MCP approval-prompt and Bitdefender friction on Windows.
-
 ### Path selection
 
-1. **Windows**: default to the terminal path. MCP is available if the user explicitly requests it, but the terminal path avoids approval-prompt and Bitdefender friction.
-2. **macOS / Linux**: default to MCP if the `codex` MCP tool is available. Otherwise fall back to the terminal path.
-3. The plugin path is available on all platforms when the user initiates it, but it is not a default.
-4. The user can override at any time (e.g., "use MCP", "use the plugin", "use the terminal").
+1. Default to the terminal path on all platforms.
+2. The plugin path is available on all platforms when the user initiates it, but it is not a default.
+3. The user can override at any time (e.g., "use the plugin", "use the terminal").
 
 ## Prerequisites
 
@@ -69,9 +64,7 @@ If the diff spans multiple types, pick the dominant one. The user can override b
 Prepare a review request with:
 
 1. **Summary** -- one to three sentences on what changed and why.
-2. **Diff scope** -- list the changed files. Diff handling depends on the channel:
-   - **MCP path**: for small diffs (under 200 lines), include `git diff --cached` output inline in the tool call. For large diffs, provide a brief summary for orientation and instruct Codex to read the changed files directly: "Read these files: [list]. The summary below is for orientation, not the basis of the review."
-   - **Terminal and plugin paths**: always tell Codex to run `git diff --cached` itself. Do not paste the diff inline; this keeps the prompt compact and avoids bloat across rounds.
+2. **Diff scope** -- list the changed files. Always tell Codex to run `git diff --cached` itself. Do not paste the diff inline; this keeps the prompt compact and avoids bloat across rounds.
 3. **Review lens** -- the content-type-specific criteria from [references/review-lenses.md](references/review-lenses.md). If a focused sub-lens or agency-specific lens fits better than the full lens, use it (e.g., `paper/formatting` for a layout-only change, `proposal/nsf` when the agency is known). See the lens tables in that file.
 4. **Additional focus** -- specific concerns beyond the generic lens. This is often the highest-value part of the prompt because it catches real bugs that generic criteria miss. Examples: "check that all appendix URLs are anonymized", "verify Year 3 budget matches the narrative", "watch for equity-related terminology drift." Ask the user if they have a specific focus, or propose one based on the nature of the change.
 5. **Round number** -- which iteration this is (starting at 1).
@@ -88,14 +81,6 @@ Prepare a review request with:
 All review prompts sent to Codex (regardless of channel) must include a save instruction **at the very top of the prompt, before the summary or diff**, so Codex sees it first. This lets Claude Code read the feedback directly from the file, and lets the user read or forward it without copy-pasting from chat. The save instruction is:
 
 > IMPORTANT: Save your complete review to `CodexReview.md` in the repository root. Overwrite any existing content. Use plain Markdown. Start the file with a `<!-- Round N -->` comment (matching the round number below) so the reader can verify freshness. Separate findings into **New** (raised for the first time) and **Previously raised** (with status: Fixed, Still open, Reopened, or Deferred) sections. On Round 1, the Previously raised section may be omitted or shown as "None." Then include the file/diff scope, review lens, findings in priority order, and concrete recommended changes. Do not skip this step.
-
-**MCP path**: Call the `codex` MCP tool with the review request (including the `CodexReview.md` instruction above).
-
-- If the call succeeds and returns a non-empty response, proceed to Phase 2.
-- If the call fails (error, timeout, empty response, or the user denies the tool call), do **not** silently continue. Instead:
-  1. Report the failure clearly, including the error message if one was returned.
-  2. Ask the user whether to retry via MCP, fall back to the terminal or plugin path, or abort.
-  3. Do not guess or fabricate a review response.
 
 **Terminal path**: Present a compact, copy-pasteable review prompt as a fenced text block. Keep the prompt under 20 lines. Tell Codex to read the diff itself (`git diff --cached`) rather than pasting it inline; this prevents prompt bloat as rounds accumulate. The abbreviated save instruction below inherits the full contract stated above (statuses, Round 1 behavior, required sections).
 
@@ -122,14 +107,13 @@ Then wait for the user to relay Codex's feedback or confirm that Codex has finis
 
 ## Phase 2: Intake Feedback
 
-Codex is instructed to write its review to `CodexReview.md` in the repository root. When the user says Codex is done (or after an MCP call returns), read `CodexReview.md` to pick up the full feedback. Before trusting the file, verify that its `<!-- Round N -->` comment matches the current round number.
+Codex is instructed to write its review to `CodexReview.md` in the repository root. When the user says Codex is done, read `CodexReview.md` to pick up the full feedback. Before trusting the file, verify that its `<!-- Round N -->` comment matches the current round number.
 
 If the file is missing, empty, or carries a stale round marker:
-1. **MCP path**: send a `codex-reply` follow-up: "You did not write CodexReview.md. Please save your review now to CodexReview.md in the repo root, starting with `<!-- Round N -->`."
-2. **Terminal / plugin path**: present a short follow-up prompt the user can paste into Codex: `Save your review to CodexReview.md in the repo root. Start with <!-- Round N -->. Overwrite any existing content.`
-3. If the file is still missing, still empty, or still carries a stale round marker after the follow-up, fall back to the MCP tool result or ask the user to paste the feedback directly.
+1. Present a short follow-up prompt the user can paste into Codex: `Save your review to CodexReview.md in the repo root. Start with <!-- Round N -->. Overwrite any existing content.`
+2. If the file is still missing, still empty, or still carries a stale round marker after the follow-up, ask the user to paste the feedback directly.
 
-- When feedback arrives (from `CodexReview.md`, MCP response, or relayed by the user), acknowledge each point.
+- When feedback arrives (from `CodexReview.md` or relayed by the user), acknowledge each point.
 - If Codex separated findings into "New" and "Previously raised" sections, verify the classifications. If Codex did not separate them (older prompts or non-compliance), do the separation yourself based on the round history.
 - Categorize each **new** point as:
   - **Will fix** -- clear, actionable, and correct.
@@ -141,7 +125,7 @@ If the file is missing, empty, or carries a stale round marker:
   - **Reopened** -- Codex re-raises a point that was marked Resolved. Flag to the user: this needs a decision, not silent re-litigation.
   - **Deferred** -- the user chose not to address this. Codex acknowledges it as unchanged. No action unless the user reconsiders.
 - Present the categorized list and confirm with the user before making changes.
-- If using MCP, use `codex-reply` for follow-up questions within the same review round.
+- For follow-up questions within the same review round, prepare a short prompt the user can paste into Codex.
 
 ## Root Review Sink
 
@@ -170,7 +154,6 @@ The loop ends when:
 - The user says the review is done or approved.
 - Codex's feedback has no actionable issues.
 - The user decides to stop iterating.
-- **MCP mode only**: The round count reaches 3. After 3 rounds, stop iterating and present the remaining feedback for the user to decide. This prevents infinite fix-and-challenge loops. The user can explicitly say "continue" to allow more rounds.
 
 At conclusion, present a short summary: total rounds, key changes made, and any unresolved points from the last review.
 

@@ -4,6 +4,11 @@ All notable changes to the shared agent configuration are documented here.
 Consuming projects pull the latest on every bootstrap run; this log helps
 track what changed between runs.
 
+## 2026-04-08
+
+### Changed
+- Removed MCP path from `implement-review` skill. Terminal copy-paste is now the default Codex channel on all platforms. Plugin path remains as an alternative.
+
 ## 2026-04-07
 
 ### Fixed
