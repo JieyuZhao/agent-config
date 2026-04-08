@@ -19,6 +19,9 @@ SKILLS_DIR = ROOT / "skills"
 POINTER_DIR = ROOT / ".claude" / "commands"
 CLAUDE_SETTINGS = ROOT / ".claude" / "settings.json"
 BOOTSTRAP_DIR = ROOT / "bootstrap"
+SCRIPTS_DIR = ROOT / "scripts"
+USER_DIR = ROOT / "user"
+REFSKILLS_DIR = ROOT / "reference-skills"
 
 
 def read_text(path: Path) -> str:
@@ -83,6 +86,10 @@ class RepoValidationTests(unittest.TestCase):
         shutil.copytree(SKILLS_DIR, remote_dir / "skills")
         shutil.copytree(POINTER_DIR, remote_dir / ".claude" / "commands")
         shutil.copy2(CLAUDE_SETTINGS, remote_dir / ".claude" / "settings.json")
+        if SCRIPTS_DIR.exists():
+            shutil.copytree(SCRIPTS_DIR, remote_dir / "scripts")
+        if USER_DIR.exists():
+            shutil.copytree(USER_DIR, remote_dir / "user")
         self.localize_remote_bootstrap_scripts(remote_dir)
 
         init = run_command(["git", "init"], remote_dir)
@@ -147,7 +154,7 @@ class RepoValidationTests(unittest.TestCase):
             )
         (project_dir / "AGENTS.md").write_text("stale-root-agents\n", encoding="utf-8")
         (project_dir / "AGENTS.local.md").write_text("## Local Rules\n- keep me\n", encoding="utf-8")
-        (project_dir / ".gitignore").write_text("node_modules/\n", encoding="utf-8")
+        (project_dir / ".gitignore").write_text("node_modules/\n/.agent-config/\n", encoding="utf-8")
         return project_dir
 
     def verify_bootstrap_result(self, project_dir: Path) -> None:
@@ -206,10 +213,31 @@ class RepoValidationTests(unittest.TestCase):
             "project-only permission should survive deep merge",
         )
 
-        gitignore_lines = (project_dir / ".gitignore").read_text(
-            encoding="utf-8"
-        ).splitlines()
-        self.assertEqual(gitignore_lines.count(".agent-config/"), 1)
+        # Verify user-level files are available in cloned repo
+        cloned_guard = (
+            project_dir / ".agent-config" / "repo" / "scripts" / "guard.py"
+        )
+        cloned_user_settings = (
+            project_dir / ".agent-config" / "repo" / "user" / "settings.json"
+        )
+        self.assertTrue(
+            cloned_guard.exists(),
+            "Expected guard.py in cloned repo scripts/",
+        )
+        self.assertTrue(
+            cloned_user_settings.exists(),
+            "Expected settings.json in cloned repo user/",
+        )
+
+        gitignore_text = (project_dir / ".gitignore").read_text(encoding="utf-8")
+        agent_config_lines = [
+            line for line in gitignore_text.splitlines()
+            if line.rstrip("/").endswith(".agent-config")
+        ]
+        self.assertEqual(
+            len(agent_config_lines), 1,
+            f"Expected exactly one .agent-config/ ignore entry, got: {agent_config_lines}",
+        )
 
     def render_powershell_smoke_script(self, remote_dir: Path) -> str:
         bootstrap_copy = str((remote_dir / "bootstrap" / "bootstrap.ps1")).replace("'", "''")
@@ -261,7 +289,7 @@ class RepoValidationTests(unittest.TestCase):
             "Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md",
             "Copy-Item .agent-config/AGENTS.md AGENTS.md -Force",
             "git clone --depth 1 --filter=blob:none --sparse https://github.com/yzhao062/agent-config.git .agent-config/repo",
-            "git -C .agent-config/repo sparse-checkout set skills .claude",
+            "git -C .agent-config/repo sparse-checkout set skills .claude scripts user",
             "Copy-Item .agent-config/repo/.claude/commands/*.md .claude/commands/ -Force",
             "Copy-Item .agent-config/repo/.claude/settings.json .claude/settings.json -Force",
             "ConvertFrom-Json",
@@ -273,7 +301,7 @@ class RepoValidationTests(unittest.TestCase):
             "cp -f .agent-config/repo/.claude/settings.json .claude/settings.json",
             "dict.fromkeys",
             "Merge-Json",
-            "git -C .agent-config/repo sparse-checkout set skills .claude",
+            "git -C .agent-config/repo sparse-checkout set skills .claude scripts user",
             "echo '.agent-config/' >> .gitignore",
         ]
         bootstrap_text = self.bootstrap_powershell_text + "\n" + self.bootstrap_bash_text
@@ -292,7 +320,7 @@ class RepoValidationTests(unittest.TestCase):
 
     def test_gitignore_excludes_local_state(self) -> None:
         for entry in (
-            "/.agent-config/",
+            ".agent-config/",
             "/.claude/settings.local.json",
             "/.idea/",
             "__pycache__/",
@@ -382,10 +410,15 @@ class RepoValidationTests(unittest.TestCase):
         for pointer_file in POINTER_DIR.glob("*.md"):
             skill_name = pointer_file.stem
             pointer_text = read_text(pointer_file)
-            self.assertIn(
-                f"skills/{skill_name}/SKILL.md",
-                pointer_text,
-                pointer_file.name,
+            local_path = f"skills/{skill_name}/SKILL.md"
+            fallback_path = f".agent-config/repo/skills/{skill_name}/SKILL.md"
+            self.assertIn(local_path, pointer_text, pointer_file.name)
+            self.assertIn(fallback_path, pointer_text, pointer_file.name)
+            local_pos = pointer_text.index(local_path)
+            fallback_pos = pointer_text.index(fallback_path)
+            self.assertLess(
+                local_pos, fallback_pos,
+                f"{pointer_file.name}: local path must appear before fallback path",
             )
 
     def test_openai_wrappers_reference_matching_skill(self) -> None:
@@ -406,6 +439,53 @@ class RepoValidationTests(unittest.TestCase):
                     linked_path.exists(),
                     f"{skill_dir.name} links to missing file: {raw_target}",
                 )
+
+    def test_reference_skills_have_core_files(self) -> None:
+        if not REFSKILLS_DIR.exists():
+            self.skipTest("reference-skills/ not present")
+        ref_skills = sorted(
+            path for path in REFSKILLS_DIR.iterdir() if path.is_dir()
+        )
+        self.assertTrue(ref_skills, "Expected at least one reference skill")
+        for skill_dir in ref_skills:
+            skill_name = skill_dir.name
+            self.assertTrue(
+                (skill_dir / "SKILL.md").exists(),
+                f"reference-skills/{skill_name} missing SKILL.md",
+            )
+            self.assertTrue(
+                (skill_dir / "agents" / "openai.yaml").exists(),
+                f"reference-skills/{skill_name} missing agents/openai.yaml",
+            )
+
+    def test_reference_skills_markdown_links_resolve(self) -> None:
+        if not REFSKILLS_DIR.exists():
+            self.skipTest("reference-skills/ not present")
+        link_pattern = re.compile(r"\[[^\]]+\]\(([^)#]+)(?:#[^)]+)?\)")
+        for skill_dir in sorted(
+            path for path in REFSKILLS_DIR.iterdir() if path.is_dir()
+        ):
+            text = read_text(skill_dir / "SKILL.md")
+            for raw_target in link_pattern.findall(text):
+                if "://" in raw_target or raw_target.startswith("#"):
+                    continue
+                linked_path = (skill_dir / raw_target).resolve()
+                self.assertTrue(
+                    linked_path.exists(),
+                    f"reference-skills/{skill_dir.name} links to missing file: {raw_target}",
+                )
+
+    def test_reference_skills_openai_wrappers(self) -> None:
+        if not REFSKILLS_DIR.exists():
+            self.skipTest("reference-skills/ not present")
+        for skill_dir in sorted(
+            path for path in REFSKILLS_DIR.iterdir() if path.is_dir()
+        ):
+            wrapper_text = read_text(skill_dir / "agents" / "openai.yaml")
+            self.assertIn(
+                "display_name:", wrapper_text,
+                f"reference-skills/{skill_dir.name}",
+            )
 
     def test_github_actions_runs_validation_on_windows_and_ubuntu(self) -> None:
         required_fragments = [

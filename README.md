@@ -74,64 +74,72 @@ After bootstrap, mention the skill name directly in the prompt. In Claude Code, 
 
 ```
 AGENTS.md                          # Shared agent config (entry point)
+bootstrap/
+  bootstrap.ps1                    # Windows bootstrap logic
+  bootstrap.sh                     # Unix bootstrap logic
+skills/                            # Shared skills (bootstrapped to all projects)
+  bibref-filler/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    assets/working.bib             # Starter template for machine-added entries
+    references/citation-rules.md   # Density, placement, and storage guidance
+    scripts/check_cite_keys.py     # Local cite-key validation helper
+  ci-mockup-figure/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+  dual-pass-workflow/
+    SKILL.md                       # Skill definition (single source of truth)
+    agents/openai.yaml             # Codex wrapper
+    references/                    # contracts.md, task-mappings.md
+    assets/                        # workflow.yaml, handoff.md, audit.md, reconcile.md
+  figure-prompt-builder/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    assets/reference-bank/         # Portable donor figures bundled with the skill
+    references/                    # figure-archetypes, reference-bank, prompt-design, tool-selection, external-handoff
+    scripts/init_figure_spec.py    # Figure brief scaffold helper
+  implement-review/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    references/review-lenses.md    # Framework-grounded review criteria (Google, NeurIPS, NSF, NIH)
+  my-router/
+    SKILL.md                       # Context-aware dispatcher for academic tasks
+    agents/openai.yaml             # Codex wrapper
+    references/routing-table.md    # Quick-reference routing table and lens selection
+reference-skills/                  # Domain skills (copied manually into project repos)
+  condense-cv/                     # CV preparation
+  cs-meta-review/                  # Area chair meta-review
+  cs-paper-review/                 # Peer review of CS papers
+  deck-assembler/                  # Slide deck assembly
+  nsf-bibref-filler/               # NSF-specific citation filling
+  nsf-figure-builder/              # NSF-specific figure building
+  nsf-proposal-composer/           # NSF proposal section drafting
+  nsf-proposal-guardrail/          # NSF compliance checking
+  nsf-thrust-refiner/              # NSF thrust polishing
+  paper-to-beamer/                 # Paper to Beamer slides
+  profile-intro-slides/            # Intro/profile presentations
+  usc-reimbursement/               # Travel/expense claims
+figure-references/                 # Reusable reference figures organized by visual job
+  index.md                         # Annotated index with role, density, and trait labels
+scripts/
+  guard.py                         # PreToolUse hook: blocks compound cd, gates destructive git/gh
+user/
+  settings.json                    # User-level Claude Code settings (permissions, hooks)
+tests/                             # Validation tests (run in CI on Ubuntu and Windows)
+  test_repo.py                     # Bootstrap contract, skill layout, smoke tests
+  test_bibref_filler.py            # Cite-key validation script tests
+  test_figure_prompt_builder.py    # Figure spec scaffold script tests
+  test_guard.py                    # Guard hook tests
 docs/
   claude-code-tips.md              # Workflows and best practices
   claude-code-reference.md         # Keyboard shortcuts, slash commands, vim mode
   claude-code-extras.md            # Buddy/companion, plugins
-bootstrap/
-  bootstrap.ps1                   # Windows bootstrap logic
-  bootstrap.sh                    # Unix bootstrap logic
-skills/
-  bibref-filler/
-    SKILL.md                       # Skill definition
-    agents/openai.yaml             # Codex wrapper
-    assets/
-      working.bib                 # Starter template for machine-added entries
-    references/
-      citation-rules.md            # Density, placement, and storage guidance
-    scripts/
-      check_cite_keys.py           # Local cite-key validation helper
-  figure-prompt-builder/
-    SKILL.md                       # Skill definition
-    agents/openai.yaml             # Codex wrapper
-    assets/
-      reference-bank/              # Portable donor figures bundled with the skill
-    references/
-      figure-archetypes.md         # Figure-type selection guide
-      reference-bank.md            # Curated donor bank index
-      prompt-design.md             # Cross-model prompting guidance
-      tool-selection.md            # Output-path and tool-choice guidance
-      external-handoff.md          # Outside-tool handoff and reprompt guidance
-    scripts/
-      init_figure_spec.py          # Figure brief scaffold helper
-  dual-pass-workflow/
-    SKILL.md                       # Skill definition (single source of truth)
-    agents/openai.yaml             # Codex wrapper
-    references/
-      contracts.md                 # Task packet and handoff/audit contracts
-      task-mappings.md             # Audit emphasis per task type
-    assets/
-      workflow.yaml                # Task packet template
-      handoff.md, audit.md, reconcile.md  # Workflow note templates
-  ci-mockup-figure/
-    SKILL.md                       # Skill definition
-    agents/openai.yaml             # Codex wrapper
-  implement-review/
-    SKILL.md                       # Skill definition
-    agents/openai.yaml             # Codex wrapper
-    references/
-      review-lenses.md             # Framework-grounded review criteria (Google, NeurIPS, NSF, NIH)
-  my-router/
-    SKILL.md                       # Context-aware dispatcher for academic tasks
-    agents/openai.yaml             # Codex wrapper
-    references/
-      routing-table.md             # Quick-reference routing table and lens selection
-.claude/commands/
-  my-router.md               # Claude Code pointer to SKILL.md
-  bibref-filler.md                 # Claude Code pointer to SKILL.md
-  ci-mockup-figure.md              # Claude Code pointer to SKILL.md
-  figure-prompt-builder.md         # Claude Code pointer to SKILL.md
-  dual-pass-workflow.md            # Claude Code pointer to SKILL.md
-  implement-review.md              # Claude Code pointer to SKILL.md
+.claude/commands/                  # Claude Code pointer commands for shared skills
+  bibref-filler.md
+  ci-mockup-figure.md
+  dual-pass-workflow.md
+  figure-prompt-builder.md
+  implement-review.md
+  my-router.md
 .claude/settings.json              # Shared Claude project defaults (effortLevel, permissions, etc.)
 ```

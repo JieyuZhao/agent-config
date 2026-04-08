@@ -5,6 +5,7 @@
 | Skill | Triggers on | What it does |
 |---|---|---|
 | `bibref-filler` | citation/bibliography work | Add verified citations to `working.bib`, keep curated bib files stable |
+| `ci-mockup-figure` | HTML mockups, TikZ/skia-canvas figures, dashboards, Gantt charts | Build space-efficient figures via HTML capture or abstract figure toolchain |
 | `figure-prompt-builder` | figure/diagram requests | Build copy-ready prompts for explanatory figures |
 | `implement-review` | staged changes + review request | Multi-round review loop with Codex, content-aware lenses |
 | `dual-pass-workflow` | multi-step build-then-audit tasks | First pass builds, second pass audits and reconciles |

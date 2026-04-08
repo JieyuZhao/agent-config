@@ -28,9 +28,7 @@
       "Bash(mkdir:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
-      "Bash(cat:*)",
-      "Bash(curl:*)",
-      "Bash(echo:*)"
+      "Bash(curl:*)"
     ]
   }
 }
