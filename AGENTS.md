@@ -71,7 +71,7 @@ Bootstrap also sets up user-level config: it copies `scripts/guard.py` to `~/.cl
 After bootstrap, run **all** of the following checks and report results in a short summary. No shell commands are needed — all information is available from session environment and config files. Only flag items that need attention — if everything is correct, a one-line confirmation is sufficient.
 
 1. **OS** -- Read the platform from the session environment (e.g., `win32`, `darwin`, `linux`). Note it for platform-specific behavior (e.g., terminal review path on Windows, MCP on macOS/Linux).
-2. **Claude Code model and effort** (Claude Code sessions only) -- If the live session environment exposes model name and effort level, check them. The user prefers the highest available model (currently Opus) at high effort. If the session is on a different model or effort, mention it once — this is a preference, not a misconfiguration.
+2. **Claude Code model and effort** (Claude Code sessions only) -- If the live session environment exposes model name and effort level, check them. The user prefers the highest available model (currently Opus) at max effort. If the session is on a different model or effort, mention it once — this is a preference, not a misconfiguration.
 3. **Codex config** -- Read `~/.codex/config.toml` (or `%USERPROFILE%\.codex\config.toml` on Windows). If the file exists, check these keys and report any that are missing or wrong:
    - `model` should be `"gpt-5.4"` (or the latest available)
    - `model_reasoning_effort` should be `"xhigh"`
