@@ -362,11 +362,11 @@ class RepoValidationTests(unittest.TestCase):
             self.assertTrue((skill_dir / "agents" / "openai.yaml").exists(), skill_name)
             self.assertTrue((POINTER_DIR / f"{skill_name}.md").exists(), skill_name)
 
-    def test_shared_claude_settings_file_is_tracked_and_sets_high_effort(self) -> None:
+    def test_shared_claude_settings_file_is_tracked_and_sets_max_effort(self) -> None:
         tracked = self.tracked_files()
         self.assertIn(".claude/settings.json", tracked)
         settings = json.loads(read_text(CLAUDE_SETTINGS))
-        self.assertEqual(settings.get("effortLevel"), "high")
+        self.assertEqual(settings.get("effortLevel"), "max")
 
     def test_skill_core_files_are_tracked(self) -> None:
         tracked = self.tracked_files()
