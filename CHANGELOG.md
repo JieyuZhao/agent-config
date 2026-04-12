@@ -4,6 +4,11 @@ All notable changes to the shared agent configuration are documented here.
 Consuming projects pull the latest on every bootstrap run; this log helps
 track what changed between runs.
 
+## 2026-04-11
+
+### Changed
+- Guard hook now shows randomized, attention-grabbing approval messages for destructive git/gh commands (e.g., "WHOA THERE COWBOY! git commit wants to run") to prevent accidental approvals.
+
 ## 2026-04-08
 
 ### Changed

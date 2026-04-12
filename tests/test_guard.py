@@ -31,6 +31,26 @@ def run_guard(command: str) -> str:
     return data["hookSpecificOutput"]["permissionDecision"].upper()
 
 
+def run_guard_full(command: str) -> dict | None:
+    """Run guard.py and return the full parsed JSON payload, or None if no output."""
+    payload = json.dumps({"tool_input": {"command": command}})
+    result = subprocess.run(
+        [sys.executable, str(GUARD)],
+        input=payload,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        raise AssertionError(
+            f"guard.py crashed (exit {result.returncode}): {result.stderr.strip()}"
+        )
+    stdout = result.stdout.strip()
+    if not stdout:
+        return None
+    return json.loads(stdout)
+
+
 class CompoundCdTests(unittest.TestCase):
     """Compound cd commands should be denied."""
 
@@ -312,6 +332,36 @@ class SafeCommandTests(unittest.TestCase):
 
     def test_cd_alone(self) -> None:
         self.assertEqual(run_guard("cd /tmp"), "PASSED")
+
+
+class JsonPayloadTests(unittest.TestCase):
+    """Verify the full JSON output structure, not just the decision string."""
+
+    def _assert_valid_payload(self, command: str, expected_decision: str) -> None:
+        data = run_guard_full(command)
+        self.assertIsNotNone(data, f"Expected output for: {command}")
+        self.assertIn("hookSpecificOutput", data)
+        hook = data["hookSpecificOutput"]
+        self.assertEqual(hook["hookEventName"], "PreToolUse")
+        self.assertEqual(hook["permissionDecision"], expected_decision)
+        self.assertIsInstance(hook["permissionDecisionReason"], str)
+        self.assertTrue(len(hook["permissionDecisionReason"]) > 0)
+
+    def test_git_commit_payload(self) -> None:
+        self._assert_valid_payload('git commit -m "msg"', "ask")
+
+    def test_git_push_payload(self) -> None:
+        self._assert_valid_payload("git push origin main", "ask")
+
+    def test_gh_pr_create_payload(self) -> None:
+        self._assert_valid_payload("gh pr create --title t", "ask")
+
+    def test_compound_cd_payload(self) -> None:
+        self._assert_valid_payload("cd /tmp && ls", "deny")
+
+    def test_safe_command_no_output(self) -> None:
+        data = run_guard_full("git status")
+        self.assertIsNone(data)
 
 
 if __name__ == "__main__":

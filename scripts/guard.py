@@ -6,6 +6,7 @@ Parses the Bash tool input JSON, extracts the command, and checks for:
 3. Destructive gh subcommands (pr create, pr merge, etc.) → ask
 """
 import json
+import random
 import re
 import shlex
 import sys
@@ -180,20 +181,30 @@ def main():
     if not parts:
         return
 
-    # Check 2: destructive git
+    # Check 2: destructive git — ask with attention-grabbing message
     if parts[0] == "git" and check_git_destructive(parts):
-        print(make_response(
-            "ask",
-            "Destructive git command detected. Confirm before proceeding."
-        ))
+        _, sub = extract_git_subcommand(parts)
+        warnings = [
+            f"WHOA THERE COWBOY! git {sub} wants to run. Are you SURE about this?!",
+            f"STOP! HAMMER TIME! A wild git {sub} appeared! Think before you click!",
+            f"RED ALERT! git {sub} is trying to sneak past you. Eyes on the screen!",
+            f"HEY! WAKE UP! git {sub} needs your blessing. Do not sleepwalk through this!",
+            f"A git {sub} walks into a bar. The bartender says: 'Are you authorized?'",
+        ]
+        print(make_response("ask", random.choice(warnings)))
         return
 
-    # Check 3: destructive gh
+    # Check 3: destructive gh — ask with attention-grabbing message
     if parts[0] == "gh" and check_gh_destructive(parts):
-        print(make_response(
-            "ask",
-            "Destructive gh command detected. Confirm before proceeding."
-        ))
+        group, action = extract_gh_subcommand(parts)
+        warnings = [
+            f"WHOA THERE COWBOY! gh {group} {action} wants to run. Are you SURE about this?!",
+            f"STOP! HAMMER TIME! A wild gh {group} {action} appeared! Think before you click!",
+            f"RED ALERT! gh {group} {action} is trying to sneak past you. Eyes on the screen!",
+            f"HEY! WAKE UP! gh {group} {action} needs your blessing. Do not sleepwalk through this!",
+            f"A gh {group} {action} walks into a bar. The bartender says: 'Are you authorized?'",
+        ]
+        print(make_response("ask", random.choice(warnings)))
         return
 
 
