@@ -64,6 +64,6 @@ P.Path(P.Path.home()/'.claude'/'settings.json').write_text(json.dumps(u,indent=2
     cp -f .agent-config/repo/user/settings.json "$HOME/.claude/settings.json"
   fi
 fi
-if [ ! -f .gitignore ] || ! grep -qx '\.agent-config/' .gitignore; then
+if [ ! -f .gitignore ] || ! grep -qE '^\/?\.agent-config/' .gitignore; then
   echo '.agent-config/' >> .gitignore
 fi

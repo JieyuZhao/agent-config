@@ -9,7 +9,7 @@ Other project repos bootstrap from this repo to get shared agent defaults and sk
 - **`AGENTS.md`** — user profile, writing/formatting defaults, environment notes, skill-sharing rules
 - **`skills/`** — shared skills (e.g., `dual-pass-workflow`, `bibref-filler`)
 - **`.claude/commands/`** — Claude Code pointer commands for shared skills
-- **`.claude/settings.json`** — shared Claude project defaults (`effortLevel: high`, permissions, etc.)
+- **`.claude/settings.json`** — shared Claude project defaults (`effortLevel: max`, permissions, etc.)
 
 ## Adding to a Project
 
@@ -97,44 +97,96 @@ GitHub Actions runs the same test suite on Ubuntu and Windows for every push and
 
 - Project-local `AGENTS.md` rules override shared defaults.
 - Project-local `skills/<name>/SKILL.md` overrides the shared copy of the same skill.
-- Project-local overrides go in `AGENTS.local.md` — bootstrap overwrites the root `AGENTS.md` on every run.
+
+## Codex MCP Integration
+
+Codex can be used from within Claude Code as an MCP server. See [AGENTS.md — Codex MCP Integration](AGENTS.md#codex-mcp-integration) for full setup instructions (registration, Windows path, approval policy, Bitdefender workarounds).
+
+## Shared Skills
+
+| Skill | Description |
+|-------|-------------|
+| `dual-pass-workflow` | Outer shell for two-pass tasks: first pass builds the artifact, optional second pass audits and reconciles. Works with any domain skill (paper review, bug fix, writing, frontend edit, etc.). |
+| `bibref-filler` | Add new external verified citations while keeping curated bibliography files stable, placing machine-added entries in a separate `working.bib`, and leaving visible unresolved notes instead of guessing. |
+| `figure-prompt-builder` | Build copy-ready prompts for explanatory figures such as overviews, workflows, mechanisms, timelines, and conceptual illustrations, using a small bundled reference bank when helpful. |
+| `implement-review` | Review loop for staged changes. Detects content type, sends to Codex (terminal or plugin) for review using established frameworks (Google/Microsoft for code, NeurIPS/ACL for papers, NSF/NIH for proposals), categorizes feedback, revises, and iterates. |
+| `ci-mockup-figure` | Build interactive HTML mockups of systems, methodological flowcharts, dashboards, and timelines, then capture as space-efficient figures for papers and proposals. |
+| `my-router` | Context-aware dispatcher that detects work type (papers, proposals, code, figures, citations, admin) and routes to the right domain skill. Works as the inner decision loop within superpowers' execution phase. |
+
+## Skill Usage
+
+After bootstrap, mention the skill name directly in the prompt. In Claude Code, the matching pointer command under `.claude/commands/` provides the same entry point. Each skill's `SKILL.md` contains full usage instructions and examples.
 
 ## Structure
 
 ```
 AGENTS.md                          # Shared agent config (entry point)
-assets/
-  vscode/
-    latex-settings.json            # LaTeX Workshop settings template (copy via /latex-setup)
-docs/
-  claude-code-tips.md
-  claude-code-reference.md
-  claude-code-extras.md
 bootstrap/
   bootstrap.ps1                    # Windows bootstrap logic
   bootstrap.sh                     # Unix bootstrap logic
-skills/
+skills/                            # Shared skills (bootstrapped to all projects)
   bibref-filler/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    assets/working.bib             # Starter template for machine-added entries
+    references/citation-rules.md   # Density, placement, and storage guidance
+    scripts/check_cite_keys.py     # Local cite-key validation helper
   ci-mockup-figure/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
   dual-pass-workflow/
+    SKILL.md                       # Skill definition (single source of truth)
+    agents/openai.yaml             # Codex wrapper
+    references/                    # contracts.md, task-mappings.md
+    assets/                        # workflow.yaml, handoff.md, audit.md, reconcile.md
   figure-prompt-builder/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    assets/reference-bank/         # Portable donor figures bundled with the skill
+    references/                    # figure-archetypes, reference-bank, prompt-design, tool-selection, external-handoff
+    scripts/init_figure_spec.py    # Figure brief scaffold helper
   implement-review/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    references/review-lenses.md    # Framework-grounded review criteria (Google, NeurIPS, NSF, NIH)
   my-router/
-reference-skills/
-  nsf-proposal-composer/
-  nsf-thrust-refiner/
-  nsf-proposal-guardrail/
-  nsf-figure-builder/
-  proposal-reviewer/
-  cs-paper-review/
-  cs-meta-review/
-  paper-improve/
-  paper-to-beamer/
-  deck-assembler/
-  profile-intro-slides/
-  condense-cv/
-  usc-reimbursement/
-.claude/commands/                  # Claude Code slash commands
+    SKILL.md                       # Context-aware dispatcher for academic tasks
+    agents/openai.yaml             # Codex wrapper
+    references/routing-table.md    # Quick-reference routing table and lens selection
+reference-skills/                  # Domain skills (copied manually into project repos)
+  condense-cv/                     # CV preparation
+  cs-meta-review/                  # Area chair meta-review
+  cs-paper-review/                 # Peer review of CS papers
+  deck-assembler/                  # Slide deck assembly
+  nsf-bibref-filler/               # NSF-specific citation filling
+  nsf-figure-builder/              # NSF-specific figure building
+  nsf-proposal-composer/           # NSF proposal section drafting
+  nsf-proposal-guardrail/          # NSF compliance checking
+  nsf-thrust-refiner/              # NSF thrust polishing
+  paper-to-beamer/                 # Paper to Beamer slides
+  profile-intro-slides/            # Intro/profile presentations
+  usc-reimbursement/               # Travel/expense claims
+figure-references/                 # Reusable reference figures organized by visual job
+  index.md                         # Annotated index with role, density, and trait labels
+scripts/
+  guard.py                         # PreToolUse hook: blocks compound cd, gates destructive git/gh
 user/
-  settings.json                    # User-level permissions and hooks (merged into ~/.claude/settings.json)
+  settings.json                    # User-level Claude Code settings (permissions, hooks)
+tests/                             # Validation tests (run in CI on Ubuntu and Windows)
+  test_repo.py                     # Bootstrap contract, skill layout, smoke tests
+  test_bibref_filler.py            # Cite-key validation script tests
+  test_figure_prompt_builder.py    # Figure spec scaffold script tests
+  test_guard.py                    # Guard hook tests
+docs/
+  claude-code-tips.md              # Workflows and best practices
+  claude-code-reference.md         # Keyboard shortcuts, slash commands, vim mode
+  claude-code-extras.md            # Buddy/companion, plugins
+.claude/commands/                  # Claude Code pointer commands for shared skills
+  bibref-filler.md
+  ci-mockup-figure.md
+  dual-pass-workflow.md
+  figure-prompt-builder.md
+  implement-review.md
+  my-router.md
+.claude/settings.json              # Shared Claude project defaults (effortLevel, permissions, etc.)
 ```

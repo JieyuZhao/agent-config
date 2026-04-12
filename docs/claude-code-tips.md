@@ -156,7 +156,7 @@ claude -p "prompt" --max-turns 10 --max-budget-usd 5  # safety limits
 | High | Complex debugging, multi-file refactors |
 | Max | System design, deeply nested bugs (Opus only, resets on session end) |
 
-Set via: `/effort low`, `claude --effort low`, `"effortLevel": "high"` in settings.json, or left/right arrows in `/model` picker.
+Set via: `/effort low`, `claude --effort low`, `"effortLevel": "max"` in settings.json, or left/right arrows in `/model` picker.
 
 ## 11. Cost & Performance
 
