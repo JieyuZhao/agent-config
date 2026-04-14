@@ -257,14 +257,20 @@ class RepoValidationTests(unittest.TestCase):
         self.assertTrue(self.skills, "Expected at least one shared skill in skills/.")
 
     def test_agents_has_fetched_copy_guard(self) -> None:
+        # The top-of-file note must distinguish source-repo behavior from
+        # consumer-repo behavior using the three file-existence markers and
+        # an imperative consumer-path instruction.
+        self.assertIn("**Source repo test:**", self.agents_text)
+        self.assertIn("`bootstrap/bootstrap.sh`", self.agents_text)
+        self.assertIn("`bootstrap/bootstrap.ps1`", self.agents_text)
+        self.assertIn("`reference-skills/`", self.agents_text)
         self.assertIn(
-            "If this file was fetched into `.agent-config/AGENTS.md`",
+            "proceed directly to `## Session Start Check`",
             self.agents_text,
         )
-        self.assertIn(
-            "read and follow the shared rules starting at `## Session Start Check`",
-            self.agents_text,
-        )
+        self.assertIn("**Consumer repo path:**", self.agents_text)
+        self.assertIn("You MUST execute", self.agents_text)
+        self.assertIn("idempotent", self.agents_text)
 
     def test_agents_bootstrap_covers_windows_and_unix_shells(self) -> None:
         required_fragments = [
