@@ -66,9 +66,10 @@ Prepare a review request with:
 1. **Summary** -- one to three sentences on what changed and why.
 2. **Diff scope** -- list the changed files. Always tell Codex to run `git diff --cached` itself. Do not paste the diff inline; this keeps the prompt compact and avoids bloat across rounds.
 3. **Review lens** -- the content-type-specific criteria from [references/review-lenses.md](references/review-lenses.md). If a focused sub-lens or agency-specific lens fits better than the full lens, use it (e.g., `paper/formatting` for a layout-only change, `proposal/nsf` when the agency is known). See the lens tables in that file.
-4. **Additional focus** -- specific concerns beyond the generic lens. This is often the highest-value part of the prompt because it catches real bugs that generic criteria miss. Examples: "check that all appendix URLs are anonymized", "verify Year 3 budget matches the narrative", "watch for equity-related terminology drift." Ask the user if they have a specific focus, or propose one based on the nature of the change.
+4. **Additional focus** -- specific concerns beyond the generic lens. This is often the highest-value part of the prompt because it catches real bugs that generic criteria miss. **Always ask the user explicitly rather than guessing.** Recurring project concerns belong here: phased-development coupling, anonymization checks, page-limit compliance, budget-to-narrative consistency, terminology drift, benchmark-claim calibration, overclaim flagging. If there are no project-specific concerns this round, write "none" rather than padding the line. Examples: "check that all appendix URLs are anonymized", "verify Year 3 budget matches the narrative", "flag any overclaim in intro / conclusion", "watch for Phase 1 / Phase 2 coupling issues".
 5. **Round number** -- which iteration this is (starting at 1).
-6. **Round history** (rounds 2+ only) -- a one-line-per-finding summary of what prior rounds raised and how each was resolved. Tag each finding as `Resolved`, `Still open`, or `Deferred`. This prevents Codex from re-litigating closed decisions and lets it verify that fixes landed instead of re-reviewing from scratch. Example:
+6. **Variant targets (multi-target reviews)** -- if the staged files cover two or more variant targets that should be reviewed separately (long + short paper version, narrative + appendix tracker, internal + external report, primary + supplement), list each target by directory or file pattern. Tell Codex to review each target in its own top-level section and then add a cross-variant drift check at the end (tables that should match, claims that should be consistent, terminology that should align).
+7. **Round history** (rounds 2+ only) -- a one-line-per-finding summary of what prior rounds raised and how each was resolved. Tag each finding as `Resolved`, `Still open`, or `Deferred`. This prevents Codex from re-litigating closed decisions and lets it verify that fixes landed instead of re-reviewing from scratch. Example:
    ```
    Prior findings:
    - DMP listed wrong project name (Resolved — fixed in round 1)
@@ -80,12 +81,12 @@ Prepare a review request with:
 
 All review prompts sent to Codex (regardless of channel) must include a save instruction **at the very top of the prompt, before the summary or diff**, so Codex sees it first. This lets Claude Code read the feedback directly from the file, and lets the user read or forward it without copy-pasting from chat. The save instruction is:
 
-> IMPORTANT: Save your complete review to `CodexReview.md` in the repository root. Overwrite any existing content. Use plain Markdown. Start the file with a `<!-- Round N -->` comment (matching the round number below) so the reader can verify freshness. Separate findings into **New** (raised for the first time) and **Previously raised** (with status: Fixed, Still open, Reopened, or Deferred) sections. On Round 1, the Previously raised section may be omitted or shown as "None." Then include the file/diff scope, review lens, findings in priority order, and concrete recommended changes. Do not skip this step.
+> IMPORTANT: Save your complete review to `CodexReview.md` in the repository root. Overwrite any existing content. Use plain Markdown. Start the file with a `<!-- Round N -->` comment (matching the round number below) so the reader can verify freshness. **Begin the review with a short "Verification notes" section (paragraph or short bulleted list; "Validation notes" is also an accepted name) stating exactly what was compiled, run, or verified (e.g., `latexmk built cleanly`, `pytest pyod/test/... 5 passed`, `checked citation X against arXiv:YYYY`). If nothing was verified at runtime, write "Verification notes: none."** Separate findings into **New** (raised for the first time) and **Previously raised** (with status: Fixed, Still open, Reopened, or Deferred) sections. On Round 1, the Previously raised section may be omitted or shown as "None." Then include the file/diff scope, review lens, findings in priority order, and concrete recommended changes. **For any finding flagged High priority, include an exact suggested rewrite with file path and line range. Use a fenced code block for multi-line rewrites.** Do not skip this step. **For examples of the expected depth and format, see `skills/implement-review/references/example-reviews/`.**
 
 **Terminal path**: Present a compact, copy-pasteable review prompt as a fenced text block. Keep the prompt under 20 lines. Tell Codex to read the diff itself (`git diff --cached`) rather than pasting it inline; this prevents prompt bloat as rounds accumulate. The abbreviated save instruction below inherits the full contract stated above (statuses, Round 1 behavior, required sections).
 
 ````
-IMPORTANT: Save your complete review to CodexReview.md in the repository root. Overwrite any existing content. Start with <!-- Round N -->. Include file/diff scope and review lens. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. Include concrete recommended changes.
+IMPORTANT: Save your complete review to CodexReview.md in the repository root. Overwrite any existing content. Start with <!-- Round N -->. Begin with a "Verification notes" paragraph or short bulleted list (what was compiled, run, or verified; "none" if nothing). Include file/diff scope and review lens. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. For High-priority findings, include an exact rewrite with file:line. See skills/implement-review/references/example-reviews/ for expected depth.
 
 Review staged changes in <repo path>. Round <N>.
 Run `git diff --cached` to see the diff. Files changed: <file list>.
@@ -93,6 +94,11 @@ Run `git diff --cached` to see the diff. Files changed: <file list>.
 Summary: <one to three sentences>
 Lens: <content type> — <abbreviated criteria, sub-lens, or agency-specific lens name>
 Focus: <additional focus if any, or omit line>
+<When the staged diff spans two or more variant targets:>
+Variant targets:
+- TARGET A: <path or pattern>
+- TARGET B: <path or pattern>
+(Review each target in its own top-level section and add a Cross-variant drift check at the end.)
 <For rounds 2+:>
 Prior findings:
 - <finding> (Resolved | Still open | Deferred)
@@ -101,7 +107,7 @@ Prior findings:
 Then wait for the user to relay Codex's feedback or confirm that Codex has finished (see Phase 2 for how Claude Code picks up the review).
 
 **Plugin path**: Tell the user the changes are ready for review and suggest what to tell Codex in the plugin. The suggestion inherits the full save contract stated above. Example:
-> "Review the staged changes (round N). Focus on [detected lens]. Save your complete review to `CodexReview.md` in the repo root. Start the file with `<!-- Round N -->`. Include file/diff scope and review lens. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. Include concrete recommended changes."
+> "Review the staged changes (round N). Focus on [detected lens]. Save your complete review to `CodexReview.md` in the repo root. Start the file with `<!-- Round N -->`. Begin with a `Verification notes` paragraph or short bulleted list (what you compiled, ran, or verified; 'none' if nothing). Include file/diff scope and review lens. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. For any High-priority finding, include an exact rewrite with file:line."
 
 Then wait for the user to relay Codex's feedback or confirm that Codex has finished.
 
@@ -110,7 +116,7 @@ Then wait for the user to relay Codex's feedback or confirm that Codex has finis
 Codex is instructed to write its review to `CodexReview.md` in the repository root. When the user says Codex is done, read `CodexReview.md` to pick up the full feedback. Before trusting the file, verify that its `<!-- Round N -->` comment matches the current round number.
 
 If the file is missing, empty, or carries a stale round marker:
-1. Present a short follow-up prompt the user can paste into Codex: `Save your review to CodexReview.md in the repo root. Start with <!-- Round N -->. Overwrite any existing content.`
+1. Present a short follow-up prompt the user can paste into Codex: `Save your review to CodexReview.md in the repo root. Overwrite any existing content. Start with <!-- Round N -->. Begin with a "Verification notes" paragraph or short bulleted list. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. For High-priority findings, include an exact rewrite with file:line.`
 2. If the file is still missing, still empty, or still carries a stale round marker after the follow-up, ask the user to paste the feedback directly.
 
 - When feedback arrives (from `CodexReview.md` or relayed by the user), acknowledge each point.
@@ -134,17 +140,19 @@ When a review produces substantial written feedback, save the latest review to `
 The purpose of `CodexReview.md` is to let the user read, reuse, and forward the latest review without copy-pasting from chat. Keep the file in plain Markdown and make it directly useful on its own. Include:
 
 - a `<!-- Round N -->` HTML comment on the first line (used by Phase 2 to verify freshness)
+- a `Verification notes` paragraph or short bulleted list at the top of the review (immediately after `# Review`), stating what was compiled, run, or verified; write "none" if nothing at runtime
 - the file or diff scope reviewed
 - the review lens or context
 - findings separated into **New** and **Previously raised** sections (previously raised items tagged Fixed, Still open, Reopened, or Deferred; on Round 1 the Previously raised section may be omitted or shown as "None")
 - concrete recommended changes, with exact values when relevant
+- for any finding flagged High priority, an exact suggested rewrite with file path and line range (use a fenced code block for multi-line rewrites)
 
 Do not stage, commit, or move `CodexReview.md` unless the user explicitly asks. Before the first review round, check whether `CodexReview.md` is excluded from git. Look in `.gitignore` and `.git/info/exclude`. If it is not excluded anywhere, append `CodexReview.md` to `.git/info/exclude` (a local, untracked ignore file) so that `git add -A` during the revision flow does not accidentally stage the scratch file. Do not edit `.gitignore` for this purpose, as that would introduce a tracked side-effect inside the review loop.
 
 ## Phase 3: Revise
 
 - Address all "will fix" points and any "needs discussion" points the user approved.
-- Update the round history: mark addressed findings as `Resolved`, keep unaddressed ones as `Still open`, and tag user-deferred items as `Deferred`. This history carries forward into the next round's prompt (Phase 1b, item 6).
+- Update the round history: mark addressed findings as `Resolved`, keep unaddressed ones as `Still open`, and tag user-deferred items as `Deferred`. This history carries forward into the next round's prompt (Phase 1b, item 7).
 - Stage the revised changes.
 - Return to Phase 1 with an incremented round number.
 
