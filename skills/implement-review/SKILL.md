@@ -107,7 +107,7 @@ Prior findings:
 Then wait for the user to relay Codex's feedback or confirm that Codex has finished (see Phase 2 for how Claude Code picks up the review).
 
 **Plugin path**: Tell the user the changes are ready for review and suggest what to tell Codex in the plugin. The suggestion inherits the full save contract stated above. Example:
-> "Review the staged changes (round N). Focus on [detected lens]. Save your complete review to `CodexReview.md` in the repo root. Start the file with `<!-- Round N -->`. Begin with a `Verification notes` paragraph or short bulleted list (what you compiled, ran, or verified; 'none' if nothing). Include file/diff scope and review lens. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. For any High-priority finding, include an exact rewrite with file:line."
+> "Review the staged changes (round N). Focus on [detected lens]. Save your complete review to `CodexReview.md` in the repo root. Start the file with `<!-- Round N -->`. Begin with a `Verification notes` paragraph or short bulleted list (what you compiled, ran, or verified; 'none' if nothing). Include file/diff scope and review lens. Separate findings into New and Previously raised (Fixed / Still open / Reopened / Deferred) sections. For any High-priority finding, include an exact rewrite with file:line. If the diff spans two or more variant targets (long + short, narrative + tracker, internal + external), review each target in its own top-level section and add a Cross-variant drift check at the end."
 
 Then wait for the user to relay Codex's feedback or confirm that Codex has finished.
 
