@@ -1,52 +1,80 @@
 # NVIDIA DGX Spark, Setup and Operations Notes
 
+> Personal setup notes kept in a public repo. Redacted to generic placeholders:
+> `spark-<XXXX>` for the hostname suffix printed on the NVIDIA quick start card,
+> `<admin>` for the primary admin user, `<collaborator>` for a second admin,
+> `<student>` for student accounts, `192.168.1.X` for example LAN IPs.
+> Substitute your own values when applying these instructions.
+
 ## Current state (as of 2026-04-13)
 
 ### Completed
-- Order received: 2 units (this document currently covers unit A / `spark-37f2`)
-- Unit A onboarded via network-device mode; hostname `spark-37f2` (default), admin user `yzhao062`
-- SSH access confirmed from Windows laptop over home Wi-Fi, using mDNS name `spark-37f2.local`
-- Second admin account created for collaborator: `xiyanghu` (in `sudo` and `docker` groups)
+- Order received: 2 units (this document currently covers unit A)
+- Unit A onboarded via network-device mode; hostname `spark-<XXXX>` (auto-generated, suffix from quick-start card), primary admin user `<admin>`
+- SSH access confirmed from Windows laptop over home Wi-Fi, using mDNS name `spark-<XXXX>.local`
+- Second admin account created for a collaborator (in `sudo` and `docker` groups)
+- Boot default switched to `multi-user.target` (headless) on 2026-04-13; Xorg and gnome-shell no longer running, GPU memory freed
 - Tailscale 1.96.4 installed; `tailscaled` systemd service running, status `Needs login` (not yet authenticated)
-- Switched boot default to `multi-user.target` (headless) on 2026-04-13; Xorg and gnome-shell no longer running, GPU memory freed
+- Claude Code 2.1.105 installed on Spark (native ARM64 binary) — gives a second agent session with local filesystem access
+- SSH key-based auth set up from Windows daily driver to Spark — tools (Claude Code, scripts, `ssh`, `scp`) can now drive Spark non-interactively
+- Miniforge3 installed at `~/miniforge3` with conda 26.1.1 / mamba 2.5.0
+- `py312` conda environment created (Python 3.12.13), auto-activated via `~/.bashrc`
+- PyTorch 2.11.0+cu128 installed in `py312` (aarch64 wheels from pytorch.org/whl/cu128), GPU access verified: `torch.cuda.is_available()` → True, device = NVIDIA GB10, compute capability 12.1 (Blackwell), real matmul test passed
 
 ### In progress
 - Tailscale authentication: next command is `sudo tailscale up --ssh`
-- Xiyang password/SSH key handoff: account exists, temp password not yet set, no SSH key installed
+- Collaborator password/SSH key handoff: account exists, temp password not yet set, no SSH key installed
 
 ### Pending next steps (when resuming)
 1. Run `sudo tailscale up --ssh` on Spark and complete browser auth on Windows
 2. Record the static Tailscale IP with `tailscale ip -4`
 3. Enable MagicDNS in Tailscale admin console
 4. Install Tailscale on Windows laptop; verify off-LAN access by tethering to phone hotspot
-5. Set temporary password for `xiyanghu` and force expiry:
+5. Set temporary password for `<collaborator>` and force expiry:
    ```
-   sudo passwd xiyanghu
-   sudo passwd --expire xiyanghu
+   sudo passwd <collaborator>
+   sudo passwd --expire <collaborator>
    ```
-6. Collect Xiyang's SSH public key, install to his `~/.ssh/authorized_keys` (see section 9)
-7. Send Xiyang the onboarding message (template in section 9)
-8. Install Tailscale on Xiyang's machine, share Spark node from admin console
+6. Collect collaborator's SSH public key, install to their `~/.ssh/authorized_keys` (see section 9)
+7. Send collaborator the onboarding message (template in section 9)
+8. Install Tailscale on collaborator's machine, share Spark node from admin console
 9. Move Spark to office (no network reconfiguration needed because of Tailscale)
 10. Unit B: repeat the entire flow once it arrives
 
 ### Known issues / gotchas discovered so far
-- **Termius paste bug**: bracketed-paste envelope (`^[[200~` ... `^[[201~`) leaks into commands as literal text on this Spark. Workaround: type commands by hand. Fix: `echo 'set enable-bracketed-paste on' >> ~/.inputrc` on Spark, or switch to Windows Terminal + native OpenSSH.
-- **DHCP IP drift**: home Wi-Fi assigned Spark different IPs on different days (`192.168.1.141` → `192.168.1.161`). Use mDNS name or Tailscale address, never hardcode the IP.
+
+- **Termius paste bug, `&&`-chain failure mode**: pasting a long `&&`-chained command can silently misfire. Termius on Windows, combined with a shell that does not fully consume bracketed-paste control codes, sometimes splits a command at an awkward point so that a redirect operator ends up on a new line. Example:
+  ```bash
+  # Pasted as one logical line:
+  echo 'some content' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo DONE
+  # Actually executed as two lines:
+  echo 'some content'                            # (1) prints "some content" to terminal (redirect missing!)
+  >> ~/.ssh/authorized_keys && chmod ... && echo DONE  # (2) null redirect creates empty file, chmods it, echoes DONE
+  ```
+  Failure mode: **everything "succeeds" (you see DONE) but the file is empty.** The key contents went to stdout instead of to the file. Specifically dangerous for setup commands that install SSH keys, secrets, or config fragments.
+
+  Workarounds:
+  - Break into single-line commands — one command per shell prompt
+  - Use `nano ~/.ssh/authorized_keys` and paste inside the editor
+  - Use a Spark-side Claude Code instance to write the file natively (see section 17)
+  - Fix bracketed paste in bash: `echo 'set enable-bracketed-paste on' >> ~/.inputrc` on Spark (may or may not help depending on terminal)
+  - Switch to Windows Terminal + native OpenSSH, which handles paste cleanly
+
+- **DHCP IP drift**: home Wi-Fi assigned Spark different IPs on different days (`192.168.1.X` → `192.168.1.Y`). Use the mDNS name or Tailscale address, never hardcode the IP.
 
 ---
 
 ## 1. Order context
 - Product: NVIDIA DGX Spark Founders Edition, 4 TB
 - Quantity: 2 units
-- Current MSRP (April 2026): $4,699 each (raised from $3,999 in late February 2026 due to memory supply constraints)
+- MSRP (April 2026): $4,699 each (raised from $3,999 in late February 2026 due to memory supply constraints)
 
 ## 2. Role in daily workflow
 Daily driver stays on Windows (PyCharm, Claude Code, Codex, Chrome, Office). Spark is a headless ML appliance, not a desktop replacement. Primary interaction model: PyCharm remote interpreter and SSH from the Windows box.
 
 ## 3. Operating system
 - Ships with NVIDIA DGX OS (Ubuntu 24.04 LTS for ARM64 / aarch64)
-- Kernel observed on `spark-37f2`: `6.17.0-1014-nvidia aarch64`
+- Kernel observed: `6.17.0-1014-nvidia aarch64`
 - DGX OS version observed: 7.5.0
 - Preinstalled: CUDA 13.0, cuDNN, NCCL, TensorRT, PyTorch containers, NIM, Docker runtime, NVIDIA driver 580.142
 - Windows and macOS cannot be installed:
@@ -67,7 +95,7 @@ The quick start card prints two credentials:
 
 These are used once during onboarding, then never again. Flow:
 1. Power on Spark (no display needed)
-2. From a laptop or phone, join the `spark-XXXX` Wi-Fi using the printed password
+2. From a laptop or phone, join the `spark-<XXXX>` Wi-Fi using the printed password
 3. Open the browser wizard at the printed URL
 4. Set timezone, create an admin Linux user account, join the real network
 5. The temporary AP shuts off after onboarding completes
@@ -78,10 +106,10 @@ Important: the Wi-Fi password on the card is NOT the SSH password. The SSH passw
 Chosen mode for both units: network device (headless). Rationale: Spark's value is as a CUDA server reached over SSH, not as a second desktop. A monitor can still be plugged in later if needed.
 
 ## 7. Local network access (on-LAN only)
-- Spark auto-advertises its hostname via mDNS as `spark-XXXX.local`
+- Spark auto-advertises its hostname via mDNS as `spark-<XXXX>.local`
 - Windows 11 recent builds resolve `.local` names natively; if resolution fails, install Apple Bonjour Print Services
 - The mDNS name is stable across reboots; raw IP is not required and should not be hardcoded
-- **Important limitation**: mDNS is link-local. `spark-37f2.local` only resolves when the client is on the same Wi-Fi / broadcast domain as the Spark. For off-LAN access, use Tailscale (section 10).
+- **Important limitation**: mDNS is link-local. `spark-<XXXX>.local` only resolves when the client is on the same Wi-Fi / broadcast domain as the Spark. For off-LAN access, use Tailscale (section 10).
 - Fallback if mDNS is flaky on LAN: add a DHCP reservation on the router to pin the IP
 
 ## 8. SSH authentication
@@ -92,7 +120,7 @@ Chosen mode for both units: network device (headless). Rationale: Spark's value 
 
 ### Initial SSH test
 ```
-ssh user@spark-a.local
+ssh <admin>@spark-<XXXX>.local
 ```
 Enter your admin password when prompted.
 
@@ -101,25 +129,41 @@ Enter your admin password when prompted.
    ```
    ssh-keygen -t ed25519
    ```
-2. Copy public key to Spark:
+2. Copy public key to Spark. Depending on whether bracketed-paste is reliable in your terminal, use one of these:
+
+   **Method A: compound command** (works if paste is clean):
    ```
-   type %USERPROFILE%\.ssh\id_ed25519.pub | ssh user@spark-a.local "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
+   type %USERPROFILE%\.ssh\id_ed25519.pub | ssh <admin>@spark-<XXXX>.local "mkdir -p ~/.ssh && cat >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys"
    ```
-3. Test: `ssh spark-a` should now log in without prompting
+   **Method B: single-line commands** (safest, avoids paste-split issue):
+   On Spark, one command at a time:
+   ```bash
+   mkdir -p ~/.ssh
+   chmod 700 ~/.ssh
+   nano ~/.ssh/authorized_keys   # paste the single key line inside nano, save with Ctrl+X Y Enter
+   chmod 600 ~/.ssh/authorized_keys
+   ```
+   **Method C: ask a Spark-side Claude Code session** (see section 17): give it the key and let it write the file natively, no shell paste involved.
+
+3. Test: `ssh spark-<XXXX>` should now log in without prompting
 4. Repeat for each unit
 
 ### SSH config on Windows
 `%USERPROFILE%\.ssh\config`:
 ```
 Host spark-a
-    HostName spark-a.local
-    User <your-user>
+    HostName spark-<XXXX>.local
+    User <admin>
     IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+    ServerAliveInterval 60
 
 Host spark-b
-    HostName spark-b.local
-    User <your-user>
+    HostName spark-<YYYY>.local
+    User <admin>
     IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+    ServerAliveInterval 60
 ```
 
 ### Optional hardening (after keys work)
@@ -159,7 +203,7 @@ EOF
 sudo -u <username> chmod 700 /home/<username>/.ssh
 sudo -u <username> chmod 600 /home/<username>/.ssh/authorized_keys
 ```
-Using `sudo -u <username>` makes files owned by them from the start, so no separate `chown` step.
+Using `sudo -u <username>` makes files owned by them from the start, so no separate `chown` step. Note: this command pattern has its own paste risk (the `<<'EOF'` heredoc), so consider pasting inside `nano` instead if your terminal has paste problems.
 
 ### Reset a forgotten password
 ```bash
@@ -180,13 +224,13 @@ Hi <name>,
 You now have an admin account on our new NVIDIA DGX Spark.
 
 Connection:
-  Host:     spark-37f2.local   (when on our Wi-Fi)
-            or spark-37f2      (via Tailscale from anywhere, once set up)
+  Host:     spark-<XXXX>.local   (when on our Wi-Fi)
+            or spark-<XXXX>      (via Tailscale from anywhere, once set up)
   Username: <username>
   Temp password: <FILL IN>
 
 To log in:
-  ssh <username>@spark-37f2.local
+  ssh <username>@spark-<XXXX>.local
 
 On your first login, the system will require you to change the
 temporary password. Set a new one and you are in.
@@ -203,6 +247,11 @@ Let me know once you are logged in.
 <your name>
 ```
 Deliver the temp password through an encrypted channel, not plain email.
+
+### Home directory isolation
+Each Linux user has their own private `/home/<username>/` directory. By default, one user cannot read inside another user's home (mode `0755` on the home directory; files inside are owned by the user). Everything — `~/.bashrc`, `~/.ssh`, `~/miniforge3`, `~/.cache`, datasets, model checkpoints — is fully isolated. When you run `sudo adduser`, Ubuntu copies the skeleton files from `/etc/skel` into the new home, so each user starts with the standard `Documents`, `Downloads`, etc. subfolders.
+
+If you ever need to drop a file into another user's home (e.g., install their SSH key before they first log in), use `sudo` or `sudo -u <username>` so the file ends up owned by them.
 
 ## 10. Remote access via Tailscale (NVIDIA-official path)
 
@@ -245,7 +294,7 @@ tailscale status
 - Second command shows the full tailnet view.
 
 ### Enable MagicDNS (one-time, in admin console)
-Go to https://login.tailscale.com/admin/dns → toggle **MagicDNS** on. Every tailnet device is then reachable by short hostname, e.g., `spark-37f2`.
+Go to https://login.tailscale.com/admin/dns → toggle **MagicDNS** on. Every tailnet device is then reachable by short hostname, e.g., `spark-<XXXX>`.
 
 ### Windows client setup
 Download from https://tailscale.com/download/windows, install, sign in with the same account. Windows tray icon shows Spark when connected.
@@ -253,21 +302,21 @@ Download from https://tailscale.com/download/windows, install, sign in with the 
 ### Verify off-LAN access
 Tether Windows laptop to phone hotspot so it leaves home Wi-Fi, then:
 ```
-ssh yzhao062@spark-37f2
+ssh <admin>@spark-<XXXX>
 ```
 If this connects, remote access is proven working before Spark ever moves offices.
 
 ### Update Windows SSH config
 ```
 Host spark
-    HostName spark-37f2
-    User yzhao062
+    HostName spark-<XXXX>
+    User <admin>
     IdentityFile ~/.ssh/id_ed25519
 ```
 From then on, `ssh spark` works from any terminal (Claude Code, Codex, PyCharm remote interpreter), regardless of network.
 
 ### Moving Spark between networks (home → office)
-No reconfiguration needed. When Spark boots at the office, `tailscaled` auto-starts, reconnects to the coordination server, and keeps the same `100.x.y.z` / `spark-37f2` address. You can SSH in from anywhere while still on the drive to the office.
+No reconfiguration needed. When Spark boots at the office, `tailscaled` auto-starts, reconnects to the coordination server, and keeps the same `100.x.y.z` / `spark-<XXXX>` address. You can SSH in from anywhere while still on the drive to the office.
 
 Office firewalls: Tailscale tries direct peer-to-peer (UDP 41641), then STUN NAT traversal, then falls back to TCP 443 DERP relays. The 443 fallback works through almost any enterprise firewall.
 
@@ -277,7 +326,7 @@ The free Personal plan caps at 3 users. For a research group with more members, 
 
 ### Option A: Tailscale Node Sharing (recommended start)
 - Keep the free Personal tailnet
-- For each student, share Spark as a node from the admin console (**Machines → spark-37f2 → Share...**)
+- For each student, share Spark as a node from the admin console (**Machines → spark-<XXXX> → Share...**)
 - Student creates their own free Personal tailnet and accepts the share
 - They see only the Spark; none of your other tailnet devices
 - Free for everyone, scales to unlimited students
@@ -315,6 +364,8 @@ Tailscale is only the network layer. You still need one Linux account per studen
   ```
   Or create a shared `/data` directory with rotation policies.
 - **Shared monitoring**: install `nvitop` system-wide so students can self-check GPU state before launching a job. A "look before you launch" norm prevents most conflicts.
+- **Slurm / scheduler**: probably not worth installing on a single-node one-GPU box until you have 5+ active users. A simple file-lock wrapper (`flock -x /tmp/gpu.lock python train.py`) handles most small-lab coordination needs.
+- **Python environments**: install Miniforge per-user initially. When user count grows, consider a shared base install at `/opt/miniforge3` with each user's environments kept in `~/.conda/envs/`.
 
 ## 12. Power consumption and running costs
 
@@ -332,7 +383,7 @@ Tailscale is only the network layer. You still need one Linux account per studen
 
 Keep firmware current; the 2026 update fixed a ConnectX-7 hot-plug bug that held idle draw at 37 W.
 
-### LADWP cost (Los Angeles residential, ~$0.30/kWh effective rate)
+### Running cost (example: LADWP Los Angeles residential, ~$0.30/kWh effective rate)
 
 Per Spark, 24/7:
 | Usage pattern | Avg draw | Per month | Per year |
@@ -343,7 +394,7 @@ Per Spark, 24/7:
 | Heavy (8 h training/day) | 81 W | $17.60 | $214 |
 | Pegged 24/7 (unlikely) | 200 W | $43.20 | $526 |
 
-Two units together, moderate usage: ~$22/month, ~$275/year.
+Two units together, moderate usage: ~$22/month, ~$275/year at LADWP rates. Substitute your local rate for other regions.
 
 ### Reducing idle power
 - Switch to `multi-user.target` to stop Xorg and gnome-shell (saves ~3 W and ~200 MiB memory, frees ~140 MiB GPU memory). See section 13 for full details, trade-offs, and verification steps.
@@ -388,7 +439,7 @@ DGX OS boots to `graphical.target` by default, which means `gdm3`, `Xorg`, and `
 
 ### What you give up
 - **Local GNOME desktop on an attached monitor.** A plugged-in display now shows a text login prompt on tty1 instead of the graphical login screen. For an SSH-only workflow this is a non-issue.
-- **GUI-only NVIDIA tools**: Nsight Systems GUI, `nvidia-settings` GUI, etc. All have CLI equivalents (`nsys` on the command line, most settings via `nvidia-smi`). You run the GUI versions on your Windows laptop connecting to Spark remotely.
+- **GUI-only NVIDIA tools**: Nsight Systems GUI, `nvidia-settings` GUI, etc. All have CLI equivalents (`nsys` on the command line, most settings via `nvidia-smi`). You run the GUI versions on your daily driver connecting to Spark remotely.
 - **Default GNOME remote desktop** stops working. You can temporarily bring the desktop back with `sudo systemctl isolate graphical.target`, or install Sunshine + Moonlight for on-demand streaming of a headless-friendly session.
 - **Nothing else.** No package changes, no data loss. CUDA, Docker, Python, tmux, vim all work identically.
 
@@ -448,7 +499,154 @@ Not a fit:
 - Not a Windows or macOS daily driver (cannot run those OSes at all)
 - Two units justified only if workflow becomes "prototype on Spark, scale on cluster"; risk is under-use if most compute stays on university clusters or cloud
 
-## 17. Primary references
+## 17. Agent access patterns (SSH automation and native Claude Code)
+
+This section covers how to give Claude Code, Codex, and other tools the ability to drive Spark without requiring human interaction for every command. Two complementary patterns:
+
+- **Pattern A**: Passwordless SSH from your daily-driver machine, so a locally-running agent can run commands on Spark via its Bash tool.
+- **Pattern B**: Install a native Claude Code instance on Spark itself, giving a separate agent session that runs directly on the box with no SSH roundtrips.
+
+Both are useful; they cover different use cases.
+
+### Pattern A: Key-based SSH for tool automation
+
+**Why**: Tools like Claude Code run commands via `bash`. If SSH requires a password, the tool cannot type it interactively. Setting up SSH key auth once lets the agent run `ssh spark <command>` non-interactively from then on.
+
+**Setup on the daily-driver machine** (one-time):
+```bash
+# Generate a key pair if one does not already exist
+ssh-keygen -t ed25519 -f ~/.ssh/id_ed25519 -N "" -C "daily-driver-for-agents"
+
+# Write an SSH config entry so `ssh spark` works as a short alias
+cat >> ~/.ssh/config <<'EOF'
+Host spark
+    HostName spark-<XXXX>.local
+    User <admin>
+    IdentityFile ~/.ssh/id_ed25519
+    StrictHostKeyChecking accept-new
+    UserKnownHostsFile ~/.ssh/known_hosts
+    ServerAliveInterval 60
+    ServerAliveCountMax 3
+EOF
+chmod 600 ~/.ssh/config
+```
+
+**Install the public key on Spark**. Three reliable methods, listed from most-bulletproof to most-convenient:
+
+1. **Use a Spark-side Claude Code session** (see Pattern B). Once Claude Code is installed on Spark, launch it, and give it a plain-English instruction:
+   > Please write `~/.ssh/authorized_keys` containing exactly this one line: `<your pubkey here>`. Make sure `~/.ssh/` is mode 700 and `authorized_keys` is mode 600. Overwrite any existing empty file.
+
+   Claude uses its native Write tool, bypassing the shell entirely — no paste, no redirect leaks, no terminal weirdness. This turned out to be the fastest way after a shell paste failed.
+
+2. **Use `nano` inside any Spark SSH session** (safe, editor-based):
+   ```bash
+   mkdir -p ~/.ssh && chmod 700 ~/.ssh
+   nano ~/.ssh/authorized_keys
+   # Inside nano: paste the single-line pubkey, Ctrl+X, Y, Enter
+   chmod 600 ~/.ssh/authorized_keys
+   ```
+
+3. **Compound one-liner via `echo`** (fastest but risky — see the `&&` paste gotcha in "Known issues" above):
+   ```bash
+   mkdir -p ~/.ssh && chmod 700 ~/.ssh && echo '<pubkey>' >> ~/.ssh/authorized_keys && chmod 600 ~/.ssh/authorized_keys && echo DONE
+   ```
+   Only use this if your terminal does not break multi-line pastes, OR if you carefully inspect the result afterward. The failure mode is silent: `DONE` prints even when the key is not actually saved.
+
+**Verify from the daily-driver**:
+```bash
+ssh -o BatchMode=yes spark 'whoami && hostname'
+```
+`BatchMode=yes` disables password prompts entirely, so the command either succeeds with no input or fails hard. If it prints `<admin>` and `spark-<XXXX>`, key auth is working and any tool that runs `ssh spark <cmd>` now works without prompting.
+
+**Revoke access later**: on Spark, delete the corresponding line from `~/.ssh/authorized_keys`:
+```bash
+sed -i '/daily-driver-for-agents/d' ~/.ssh/authorized_keys
+```
+(Matches by the comment you put in the key when you generated it.)
+
+**Optional speed boost: SSH ControlMaster**. Each `ssh spark <command>` normally does a TCP+SSH handshake (~200–500 ms). Add these to `~/.ssh/config` so one connection is reused across multiple commands (~50 ms per command after the first):
+```
+Host spark
+    # ... existing settings ...
+    ControlMaster auto
+    ControlPath ~/.ssh/cm-%r@%h:%p
+    ControlPersist 5m
+```
+Then `mkdir -p ~/.ssh/cm-*` so the socket directory exists. Useful when an agent runs many small commands in a row during a setup session.
+
+### Pattern B: Native Claude Code on Spark
+
+**Why**: SSH from the daily driver works, but every tool call has SSH overhead. For a workflow with many small file operations (navigating a large codebase, running many short commands, editing many files), that latency compounds. A Claude Code instance running **on Spark itself** uses Spark's local shell and filesystem directly — tool calls take single-digit milliseconds instead of hundreds.
+
+You end up with two agent sessions:
+
+```
+┌──────────────────────┐       ┌──────────────────────┐
+│ Daily-driver session │       │  Spark-native session│
+│                      │       │                      │
+│  Bash → local shell  │       │  Bash → local shell  │
+│  Files → local disk  │       │  Files → Spark disk  │
+│  To touch Spark:     │       │  Native access       │
+│  ssh spark <cmd>     │       │  (no SSH)            │
+└──────────────────────┘       └──────────────────────┘
+```
+
+**Install** on Spark:
+```bash
+# SSH into Spark as <admin>, then:
+curl -fsSL https://claude.ai/install.sh | sh
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+source ~/.bashrc
+claude --version
+```
+The installer detects aarch64 and downloads the right binary. Tested working: Claude Code 2.1.105 on DGX OS 7.5.0.
+
+**First launch (browser auth)**:
+```bash
+claude
+```
+Prints a URL with a one-time code. Open the URL in a browser on your daily-driver, sign in to your Anthropic account, paste the code back into the Spark terminal. One-time; subsequent launches are silent. If Spark has a full browser (graphical.target), the flow can happen locally instead.
+
+**Long-running sessions with tmux**:
+Claude Code runs inside the SSH session. If the SSH drops (network blip, closing the terminal), the Claude instance exits. For longer work, wrap it in tmux so it survives disconnects:
+```bash
+sudo apt install -y tmux   # one-time
+tmux new -s claude
+claude
+# Ctrl+B then D to detach; the session keeps running in the background
+# Later, from any Spark shell:
+tmux attach -t claude
+```
+
+**Bootstrap your shared agent-config on Spark** (so the Spark-side session uses the same skills, conventions, and command aliases as your daily-driver session):
+```bash
+mkdir -p ~/projects/spark-sandbox
+cd ~/projects/spark-sandbox
+git init -q
+mkdir -p .agent-config .claude/commands
+curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh
+bash .agent-config/bootstrap.sh
+claude
+```
+
+**Config location**: Spark-side Claude Code state lives in `~/.claude/` on Spark (auth token, conversation history, skills cache). It is completely independent from your daily-driver `~/.claude/`. Two independent installations, two independent logins, two independent conversation histories.
+
+### When to use which pattern
+
+| Task | Pattern A (SSH from daily driver) | Pattern B (Claude on Spark) |
+|---|:---:|:---:|
+| One-off setup commands | ✓ | |
+| Cross-machine work (files on both sides) | ✓ | |
+| Heavy ML development (training scripts, debugging) | | ✓ |
+| High-frequency file operations | | ✓ |
+| Large remote codebase navigation | | ✓ |
+| Configuring Spark from outside | ✓ | |
+| Need to stay in sync with daily-driver context | ✓ | |
+| Latency-sensitive interactive work | | ✓ |
+
+**Both are valid and complementary.** Daily-driver agent for cross-machine orchestration, Spark-native agent for in-depth work on Spark. You can even let them coordinate through shared files (e.g., daily-driver agent SSHes in, writes a task description to `/home/<admin>/task.md`; Spark-native agent picks it up and works on it). Overkill for most situations but possible.
+
+## 18. Primary references
 - DGX Spark User Guide (PDF): https://docs.nvidia.com/dgx/dgx-spark/dgx-spark.pdf
 - Initial Setup, First Boot: https://docs.nvidia.com/dgx/dgx-spark/first-boot.html
 - Set Up Local Network Access: https://build.nvidia.com/spark/connect-to-your-spark
@@ -462,3 +660,4 @@ Not a fit:
 - LADWP Residential Electric Rates: https://www.ladwp.com/account/understanding-your-rates/residential-electric-rates
 - Tailscale Node Sharing: https://tailscale.com/docs/features/sharing
 - Tailscale Free Plans and Discounts: https://tailscale.com/kb/1154/free-plans-discounts
+- Claude Code installation: https://claude.ai/install.sh
