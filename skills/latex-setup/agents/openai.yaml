@@ -1,0 +1,4 @@
+interface:
+  display_name: "LaTeX Setup"
+  short_description: "One-time LaTeX project bootstrap: write .vscode/settings.json and create out/ for latexmk builds"
+  default_prompt: "Use $latex-setup to bootstrap LaTeX Workshop configuration in this project. Detect whether .vscode/settings.json exists and whether it has latex-workshop keys. If already configured, stop. Otherwise show the config from assets/latex-settings.json, ask for confirmation, then write or merge into .vscode/settings.json and create out/ at the project root. Do not install tooling and do not edit .tex or .bib files."

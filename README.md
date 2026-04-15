@@ -46,6 +46,7 @@ After pasting the bootstrap block into the project's `AGENTS.md`, tell the agent
 | `figure-prompt-builder` | Build copy-ready prompts for explanatory figures such as overviews, workflows, and timelines. |
 | `implement-review` | Review loop for staged changes. Detects content type, sends to Codex for review, categorizes feedback, revises, and iterates. |
 | `ci-mockup-figure` | Build interactive HTML mockups of systems, flowcharts, dashboards, and timelines, then capture as space-efficient figures. |
+| `latex-setup` | One-time LaTeX project bootstrap: write or merge VS Code LaTeX Workshop config and create `out/`. Auto-invoked at session-start for LaTeX projects without editor config. |
 | `my-router` | Context-aware dispatcher that detects work type and routes to the right domain skill automatically. |
 
 ## Reference Skills
@@ -111,6 +112,7 @@ Codex can be used from within Claude Code as an MCP server. See [AGENTS.md — C
 | `figure-prompt-builder` | Build copy-ready prompts for explanatory figures such as overviews, workflows, mechanisms, timelines, and conceptual illustrations, using a small bundled reference bank when helpful. |
 | `implement-review` | Review loop for staged changes. Detects content type, sends to Codex (terminal or plugin) for review using established frameworks (Google/Microsoft for code, NeurIPS/ACL for papers, NSF/NIH for proposals), categorizes feedback, revises, and iterates. |
 | `ci-mockup-figure` | Build interactive HTML mockups of systems, methodological flowcharts, dashboards, and timelines, then capture as space-efficient figures for papers and proposals. |
+| `latex-setup` | One-time LaTeX project bootstrap: write or merge VS Code LaTeX Workshop config into `.vscode/settings.json` and create `out/`. Auto-invoked at session-start when a project has `.tex` files but no editor config. |
 | `my-router` | Context-aware dispatcher that detects work type (papers, proposals, code, figures, citations, admin) and routes to the right domain skill. Works as the inner decision loop within superpowers' execution phase. |
 
 ## Skill Usage
@@ -134,6 +136,10 @@ skills/                            # Shared skills (bootstrapped to all projects
   ci-mockup-figure/
     SKILL.md                       # Skill definition
     agents/openai.yaml             # Codex wrapper
+  latex-setup/
+    SKILL.md                       # Skill definition
+    agents/openai.yaml             # Codex wrapper
+    assets/latex-settings.json     # Shared VS Code LaTeX Workshop config
   dual-pass-workflow/
     SKILL.md                       # Skill definition (single source of truth)
     agents/openai.yaml             # Codex wrapper
@@ -187,6 +193,7 @@ docs/
   dual-pass-workflow.md
   figure-prompt-builder.md
   implement-review.md
+  latex-setup.md
   my-router.md
 .claude/settings.json              # Shared Claude project defaults (effortLevel, permissions, etc.)
 ```

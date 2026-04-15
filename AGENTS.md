@@ -80,6 +80,12 @@ After bootstrap, run **all** of the following checks and report results in a sho
    
    If the file does not exist and Codex is expected, note that too.
 
+## Project Type Setup
+
+After the session-start checks, inspect the project for known types and run one-time setup skills. These are bootstrap-stage dispatches handled by the router, not task-time dispatches. Each setup skill asks for user confirmation before writing, so they are safe to auto-invoke. Skip if `AGENTS.local.md` opts out.
+
+- **LaTeX project** -- If the project contains `.tex` files at the root or in standard locations (e.g., `main.tex`), check whether `.vscode/settings.json` exists and already has `latex-workshop.*` keys. If the keys are missing, invoke the `latex-setup` skill (`skills/latex-setup/SKILL.md` locally, or `.agent-config/repo/skills/latex-setup/SKILL.md` after bootstrap). The skill writes or merges the shared LaTeX Workshop config and creates `out/`. If `.vscode/settings.json` already has `latex-workshop.*` keys, say "LaTeX settings already configured" and skip.
+
 ## User Profile
 
 - These are user-level defaults that can be reused across projects unless a local repo rule or task-specific instruction is stricter.

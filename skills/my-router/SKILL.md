@@ -44,6 +44,7 @@ The user's prompt often contains the clearest signal. Match keywords to skills:
 | "mockup", "HTML figure", "HTML mockup", "interactive figure", "dashboard mockup", "Gantt", "screenshotable figure", "capture mode", "skia-canvas", "TikZ figure", "arrow routing" | `ci-mockup-figure` | `skills/` (shared) |
 | "review staged", "review changes", "review the diff" | `implement-review` | `skills/` (shared) |
 | "two-pass", "first pass", "second pass", "audit" | `dual-pass-workflow` | `skills/` (shared) |
+| "latex setup", "set up latex", "configure latex", "vscode latex", "latex workshop" | `latex-setup` | `skills/` (shared) |
 | "proposal", "nsf", "nih", "grant", "solicitation", "aim", "thrust" | Proposal skills (check for local `nsf-*`, `nih-*` skills first) | `reference-skills/` (project-local) |
 | "review proposal", "review this draft", "score this proposal", "proposal feedback", "is the challenge clear", "differentiation" (in proposal context) | `proposal-reviewer` | `reference-skills/` (project-local) |
 | "improve writing", "rewrite this", "polish", "make this clearer", "review this paragraph", "is this logical", "diagnose" (in paper context) | `paper-improve` | `reference-skills/` (project-local) |
@@ -59,6 +60,7 @@ If prompt keywords are ambiguous, inspect the files being worked on:
 
 | Files present | Likely context | Default skill |
 |---|---|---|
+| `.tex` files present, no `.vscode/settings.json` with `latex-workshop.*` keys | LaTeX project without editor setup | `latex-setup` — run at session-start/bootstrap to install VS Code LaTeX Workshop config and create `out/` |
 | `.tex` + `.bib` in a `paper/` or manuscript directory | Paper writing | `bibref-filler` for citations, `implement-review` (paper lens) for review |
 | `.tex` + `.bib` in a `proposal/` or `nsf/` or `grant/` directory | Proposal writing | Proposal skills (check for local `nsf-*` or `nih-*` skills first), `implement-review` (ask user which agency lens) for review |
 | `.py`, `.js`, `.ts`, or other code files | Code | Superpowers handles directly (brainstorm → plan → execute → verify) |
@@ -83,6 +85,14 @@ Some projects declare their type in `AGENTS.local.md` or directory naming:
 3. **If file context matches but prompt is vague** (e.g., "help me with this") → state the detected context and proposed skill, ask the user to confirm before proceeding.
 4. **If multiple skills could apply** (e.g., "review this proposal" matches both `implement-review` and local proposal skills) → use `implement-review` as the outer loop and ask the user which agency lens to apply (NSF, NIH, etc.). Load any local proposal skills as supplementary criteria.
 5. **If nothing matches** → fall through to superpowers or general Claude behavior. Do not force a skill where none fits.
+
+## Bootstrap-Stage Routing
+
+Some skills are one-time project bootstrap steps rather than task dispatches. The router runs these automatically right after session-start checks, before any user task:
+
+- **`latex-setup`** → trigger when the project has `.tex` files but no `.vscode/settings.json` with `latex-workshop.*` keys. The skill itself asks for user confirmation before writing files, so it is safe to auto-invoke.
+
+Bootstrap-stage skills do not block the session. If the user has a task prompt already, run the bootstrap check in parallel or defer it to the end, whichever is less disruptive. If the user has explicitly opted out (via `AGENTS.local.md` or a direct instruction), skip.
 
 ## Skill Lookup Order
 

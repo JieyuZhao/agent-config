@@ -1,6 +1,3 @@
-Check whether `.vscode/settings.json` exists in the current project root.
+Read and follow the skill definition. Look for it at `skills/latex-setup/SKILL.md` first, then `.agent-config/repo/skills/latex-setup/SKILL.md`.
 
-- If it already exists, read it and report whether it contains `latex-workshop` keys. If yes, say "LaTeX settings already configured" and stop.
-- If it does not exist, show the user what will be copied (the LaTeX Workshop config from `.agent-config/repo/assets/vscode/latex-settings.json`) and ask for confirmation before creating `.vscode/settings.json`.
-- After confirmation, create `.vscode/` if needed and write the file.
-- Also create `out/` in the project root if it does not exist, since the config sets `outDir: "./out"`.
+Apply it to the user's current task. Also read the supporting files under the skill's assets/ directory (in particular `assets/latex-settings.json`) as needed.
