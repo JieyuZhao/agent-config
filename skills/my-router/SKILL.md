@@ -45,6 +45,7 @@ The user's prompt often contains the clearest signal. Match keywords to skills:
 | "review staged", "review changes", "review the diff" | `implement-review` | `skills/` (shared) |
 | "two-pass", "first pass", "second pass", "audit" | `dual-pass-workflow` | `skills/` (shared) |
 | "latex setup", "set up latex", "configure latex", "vscode latex", "latex workshop" | `latex-setup` | `skills/` (shared) |
+| "evolve this skill", "update this skill", "learn from this session", "summarize my feedback on X", "propose skill updates" | `skill-evolve` | `skills/` (shared) |
 | "proposal", "nsf", "nih", "grant", "solicitation", "aim", "thrust" | Proposal skills (check for local `nsf-*`, `nih-*` skills first) | `reference-skills/` (project-local) |
 | "review proposal", "review this draft", "score this proposal", "proposal feedback", "is the challenge clear", "differentiation" (in proposal context) | `proposal-reviewer` | `reference-skills/` (project-local) |
 | "improve writing", "rewrite this", "polish", "make this clearer", "review this paragraph", "is this logical", "diagnose" (in paper context) | `paper-improve` | `reference-skills/` (project-local) |

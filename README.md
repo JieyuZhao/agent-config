@@ -48,6 +48,7 @@ After pasting the bootstrap block into the project's `AGENTS.md`, tell the agent
 | `implement-review` | Review loop for staged changes. Detects content type, sends to Codex for review, categorizes feedback, revises, and iterates. |
 | `ci-mockup-figure` | Build interactive HTML mockups of systems, flowcharts, dashboards, and timelines, then capture as space-efficient figures. |
 | `latex-setup` | One-time LaTeX project bootstrap: write or merge VS Code LaTeX Workshop config and create `out/`. Auto-invoked at session-start for LaTeX projects without editor config. |
+| `skill-evolve` | Meta-skill: harvest in-session feedback on a target skill, show diff vs baseline, and land approved rules in project override, master skill, or user memory. Explicit invocation only. |
 | `my-router` | Context-aware dispatcher that detects work type and routes to the right domain skill automatically. |
 
 ## Reference Skills
@@ -114,6 +115,7 @@ Codex can be used from within Claude Code as an MCP server. See [AGENTS.md — C
 | `implement-review` | Review loop for staged changes. Detects content type, sends to Codex (terminal or plugin) for review using established frameworks (Google/Microsoft for code, NeurIPS/ACL for papers, NSF/NIH for proposals), categorizes feedback, revises, and iterates. |
 | `ci-mockup-figure` | Build interactive HTML mockups of systems, methodological flowcharts, dashboards, and timelines, then capture as space-efficient figures for papers and proposals. |
 | `latex-setup` | One-time LaTeX project bootstrap: write or merge VS Code LaTeX Workshop config into `.vscode/settings.json` and create `out/`. Auto-invoked at session-start when a project has `.tex` files but no editor config. |
+| `skill-evolve` | Meta-skill: scan the current session for feedback signals on a named target skill (corrections, preferences, validated judgments), classify each as project-local / master / user-memory, show unified diffs, and write only after per-row approval. |
 | `my-router` | Context-aware dispatcher that detects work type (papers, proposals, code, figures, citations, admin) and routes to the right domain skill. Works as the inner decision loop within superpowers' execution phase. |
 
 ## Skill Usage
@@ -141,6 +143,9 @@ skills/                            # Shared skills (bootstrapped to all projects
     SKILL.md                       # Skill definition
     agents/openai.yaml             # Codex wrapper
     assets/latex-settings.json     # Shared VS Code LaTeX Workshop config
+  skill-evolve/
+    SKILL.md                       # Meta-skill: harvest in-session feedback, diff vs baseline, land approved rules
+    agents/openai.yaml             # Codex wrapper
   dual-pass-workflow/
     SKILL.md                       # Skill definition (single source of truth)
     agents/openai.yaml             # Codex wrapper
@@ -196,6 +201,7 @@ docs/
   implement-review.md
   latex-setup.md
   my-router.md
+  skill-evolve.md
 .claude/settings.json              # Shared Claude project defaults (permissions, attribution, etc.)
 user/settings.json                 # Shared user-level defaults (permissions, hooks, CLAUDE_CODE_EFFORT_LEVEL=max env entry)
 ```

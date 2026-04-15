@@ -1,0 +1,4 @@
+interface:
+  display_name: "Skill Evolve"
+  short_description: "Summarize in-session feedback on a skill, show diff vs baseline, and land approved changes in project override, master skill, or user memory"
+  default_prompt: "Use $skill-evolve to harvest feedback I've given about a specific skill during this session. Identify the target skill, load the baseline SKILL.md, extract generalizable rules from my corrections/preferences/validated judgments, classify each as project-local / master-skill / user-memory, show me a review table plus unified diffs, and only write after I approve each row."
