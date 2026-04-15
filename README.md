@@ -9,7 +9,8 @@ Other project repos bootstrap from this repo to get shared agent defaults and sk
 - **`AGENTS.md`** — user profile, writing/formatting defaults, environment notes, skill-sharing rules
 - **`skills/`** — shared skills (e.g., `dual-pass-workflow`, `bibref-filler`)
 - **`.claude/commands/`** — Claude Code pointer commands for shared skills
-- **`.claude/settings.json`** — shared Claude project defaults (`effortLevel: max`, permissions, etc.)
+- **`.claude/settings.json`** — shared Claude project defaults (permissions, attribution, etc.)
+- **`user/settings.json`** — shared user-level Claude defaults (permissions, hook wiring, `CLAUDE_CODE_EFFORT_LEVEL=max` env entry that pins effort to max)
 
 ## Adding to a Project
 
@@ -195,5 +196,6 @@ docs/
   implement-review.md
   latex-setup.md
   my-router.md
-.claude/settings.json              # Shared Claude project defaults (effortLevel, permissions, etc.)
+.claude/settings.json              # Shared Claude project defaults (permissions, attribution, etc.)
+user/settings.json                 # Shared user-level defaults (permissions, hooks, CLAUDE_CODE_EFFORT_LEVEL=max env entry)
 ```

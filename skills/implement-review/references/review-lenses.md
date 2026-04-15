@@ -88,8 +88,49 @@ If unsure which to use, use the full parent lens and add an "additional focus" t
 | `paper/content` | Paper | Items 1-5 (soundness through related work) | Substantive content or argument changes |
 | `paper/submission-ready` | Paper | Items 7, 8, 9 plus anonymization checks and page-limit compliance | Blind-submission preparation (pre-acceptance) |
 | `proposal/compliance` | Proposal | Common items 1, 6 (alignment with call, formatting) | Formatting and solicitation compliance checks |
+| `website` | General | items 1-5 in the Website subsection | Static sites, personal sites, documentation sites, landing pages |
+| `plan` | General | items 1-6 in the Plan subsection | Methodology docs, roadmaps, research backlogs, migration plans, phased-development design docs, superpowers-style spec docs |
+| `skill` | General | items 1-6 in the Skill subsection | Editing `SKILL.md` files, adding references/scripts to a skill, meta-skill work |
 
 When using a focused sub-lens, include only the referenced parent criteria in the review prompt, not the full lens. For `paper/submission-ready`, also add: verify no author-identifying information remains and confirm the paper meets venue page limits.
+
+### Website
+
+Criteria for the `website` focused sub-lens. Parent: General.
+
+1. **Version and metadata consistency** -- JSON-LD `softwareVersion`, meta tags, footer versions, and similar markers match the underlying source of truth (repo, release notes, upstream README).
+2. **Factual accuracy of external claims** -- download counts, credits, citations, affiliated institutions, publication lists. Verify against upstream sources when possible.
+3. **Structured data consistency** -- JSON-LD, OpenGraph, and Twitter card metadata consistent with visible page content (no mismatched titles, descriptions, or version strings).
+4. **Asset correctness** -- images have the right dimensions for their use (social cards at 1200x630, avatars square-cropped), alt text present, no broken links.
+5. **Regression against prior review rounds** -- do not flag earlier-round fixes as new issues; explicitly note prior findings still in force.
+
+When to use: static sites, personal sites, documentation sites, landing pages.
+
+### Plan
+
+Criteria for the `plan` focused sub-lens. Parent: General.
+
+1. **Completeness** -- does the plan cover the steps it claims to? Are there missing preconditions, hand-offs, or post-conditions?
+2. **Feasibility** -- is the timeline realistic given scope and dependencies? Are external dependencies and blockers named?
+3. **Internal consistency** -- do sections presuppose things other sections assume? Do the "what" and the "how" match?
+4. **Alignment with implementation** -- if the plan describes code, config, or content that already exists, does the description match what is actually there?
+5. **Risk surfacing** -- are known failure modes named, and are mitigations proposed or explicitly deferred?
+6. **Acceptance criteria** -- can "done" be checked objectively? Are success metrics or verification steps stated?
+
+When to use: methodology docs, research backlogs, roadmaps, migration plans, phased-development design docs, superpowers-style design specs (`docs/superpowers/specs/*.md`).
+
+### Skill
+
+Criteria for the `skill` focused sub-lens. Parent: General. Meta-lens for editing skill definitions.
+
+1. **Frontmatter accuracy** -- does the `description` field match the actual behavior? Would a routing layer pick the right tasks to invoke it?
+2. **Instruction clarity** -- can a cold reader (human or agent) follow the skill without additional context?
+3. **Edge-case coverage** -- what happens when a required precondition is missing? What happens on failure at each phase?
+4. **Contract consistency** -- do all sections use the same terminology and data shapes? Does the save/output contract match the intake/parsing contract?
+5. **Invocation guarantees** -- are inputs, outputs, and side effects declared at the top? Are dependencies on other skills or external tools named?
+6. **Integration** -- how does this skill interact with other skills, hooks, or the broader workflow? Are hand-off points clear?
+
+When to use: editing SKILL.md files, adding references/scripts to a skill, meta-skill work (e.g., polishing the `implement-review` skill itself).
 
 ### Agency-specific lenses
 
@@ -99,6 +140,10 @@ When using a focused sub-lens, include only the referenced parent criteria in th
 | `proposal/nih` | Proposal (generic) | NIH Simplified Peer Review: Importance, Rigor and Feasibility, Expertise and Resources | NIH proposals when agency is known |
 
 When using an agency-specific lens, include the full agency framework from the Proposal section above (NSF or NIH subsection). Always also include the Common proposal dimensions (alignment with call, feasibility, significance, budget, clarity, formatting), as these apply regardless of agency.
+
+### Multi-target reviews
+
+When the staged diff contains two or more variant targets that should be reviewed separately (long + short paper version, narrative + tracker, internal + external report, primary + supplement), structure the review with one top-level section per target plus a cross-variant drift check at the end. Treat each target as a self-contained sub-review -- its own scope line, findings, and recommendations -- then add a final "Cross-variant drift" section that flags tables, claims, terminology, or numbers that should be consistent across targets but are not.
 
 ## General
 

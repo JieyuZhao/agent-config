@@ -257,14 +257,20 @@ class RepoValidationTests(unittest.TestCase):
         self.assertTrue(self.skills, "Expected at least one shared skill in skills/.")
 
     def test_agents_has_fetched_copy_guard(self) -> None:
+        # The top-of-file note must distinguish source-repo behavior from
+        # consumer-repo behavior using the three file-existence markers and
+        # an imperative consumer-path instruction.
+        self.assertIn("**Source repo test:**", self.agents_text)
+        self.assertIn("`bootstrap/bootstrap.sh`", self.agents_text)
+        self.assertIn("`bootstrap/bootstrap.ps1`", self.agents_text)
+        self.assertIn("`reference-skills/`", self.agents_text)
         self.assertIn(
-            "If this file was fetched into `.agent-config/AGENTS.md`",
+            "proceed directly to `## Session Start Check`",
             self.agents_text,
         )
-        self.assertIn(
-            "read and follow the shared rules starting at `## Session Start Check`",
-            self.agents_text,
-        )
+        self.assertIn("**Consumer repo path:**", self.agents_text)
+        self.assertIn("You MUST execute", self.agents_text)
+        self.assertIn("idempotent", self.agents_text)
 
     def test_agents_bootstrap_covers_windows_and_unix_shells(self) -> None:
         required_fragments = [
@@ -362,11 +368,22 @@ class RepoValidationTests(unittest.TestCase):
             self.assertTrue((skill_dir / "agents" / "openai.yaml").exists(), skill_name)
             self.assertTrue((POINTER_DIR / f"{skill_name}.md").exists(), skill_name)
 
-    def test_shared_claude_settings_file_is_tracked_and_sets_max_effort(self) -> None:
+    def test_shared_claude_settings_file_is_tracked(self) -> None:
         tracked = self.tracked_files()
         self.assertIn(".claude/settings.json", tracked)
-        settings = json.loads(read_text(CLAUDE_SETTINGS))
-        self.assertEqual(settings.get("effortLevel"), "max")
+
+    def test_max_effort_is_set_via_env_var_in_user_settings(self) -> None:
+        tracked = self.tracked_files()
+        self.assertIn("user/settings.json", tracked)
+        user_settings = json.loads(
+            read_text(ROOT / "user" / "settings.json")
+        )
+        self.assertEqual(
+            user_settings.get("env", {}).get("CLAUDE_CODE_EFFORT_LEVEL"),
+            "max",
+        )
+        claude_settings = json.loads(read_text(CLAUDE_SETTINGS))
+        self.assertNotIn("effortLevel", claude_settings)
 
     def test_skill_core_files_are_tracked(self) -> None:
         tracked = self.tracked_files()

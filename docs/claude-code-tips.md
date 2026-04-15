@@ -156,7 +156,7 @@ claude -p "prompt" --max-turns 10 --max-budget-usd 5  # safety limits
 | High | Complex debugging, multi-file refactors |
 | Max | System design, deeply nested bugs (Opus only, resets on session end) |
 
-Set via: `/effort low`, `claude --effort low`, `"effortLevel": "max"` in settings.json, or left/right arrows in `/model` picker.
+Set via: `/effort low|medium|high|auto` (persists to user settings), `/effort max` (session only, because `max` is not a valid persisted value), `claude --effort <level>` at launch (session only), `"effortLevel": "low|medium|high"` in `settings.json` for persisted low/medium/high, or the `CLAUDE_CODE_EFFORT_LEVEL` env var, which is the only way to persist `max` (for example, `"env": {"CLAUDE_CODE_EFFORT_LEVEL": "max"}` in `~/.claude/settings.json`). The env var outranks CLI and slash-command overrides. Left/right arrows in the `/model` picker also change the level.
 
 ## 11. Cost & Performance
 
