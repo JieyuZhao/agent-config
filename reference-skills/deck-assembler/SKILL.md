@@ -1,6 +1,6 @@
 ---
 name: deck-assembler
-description: Assemble a coherent USC Beamer talk from the reusable Yue Zhao intro module and one or more existing paper decks in this repo. Use when the user wants a merged deck with light bridge slides, trimmed duplicate wrappers, and one throughline, without regenerating each paper talk from scratch.
+description: Assemble a coherent USC Beamer talk from the reusable Jieyu Zhao intro module and one or more existing paper decks in this repo. Use when the user wants a merged deck with light bridge slides, trimmed duplicate wrappers, and one throughline, without regenerating each paper talk from scratch.
 ---
 
 # Deck Assembler
@@ -31,8 +31,8 @@ Before generating anything, verify that the workspace contains at least:
 
 Useful optional sources:
 
-- `templates/modules/yzhao-intro-slides.tex`
-- `templates/modules/yzhao-intro-facts.md`
+- `templates/modules/jzhao-intro-slides.tex`
+- `templates/modules/jzhao-intro-facts.md`
 - `decks/<paper-slug>/presenter-map.md`
 
 If the contract is not satisfied, stop and ask the user instead of improvising a different layout.
@@ -51,7 +51,7 @@ Compile the merged deck by default if the local LaTeX toolchain works. Output PD
 ## Workflow
 
 1. Verify the workspace contract and identify the inputs:
-   - whether the merged deck should include `templates/modules/yzhao-intro-slides.tex`
+   - whether the merged deck should include `templates/modules/jzhao-intro-slides.tex`
    - which existing paper decks under `decks/` will be merged
    - the desired `<talk-slug>`, or derive one only if the user does not care
 2. Define one master throughline before moving slides:
@@ -98,7 +98,7 @@ Compile the merged deck by default if the local LaTeX toolchain works. Output PD
 
 - This skill assembles from existing decks and modules. If the user only has a paper source under `papers/`, use `$paper-to-beamer` first.
 - Preserve the source decks. Do not destructively rewrite or delete the original paper decks just to make the merged deck work.
-- Treat `templates/modules/yzhao-intro-slides.tex` as the reusable intro insert when the user wants a personal or lab opening.
+- Treat `templates/modules/jzhao-intro-slides.tex` as the reusable intro insert when the user wants a personal or lab opening.
 - Use one master title page, one master roadmap if needed, and one master closing direction for the merged deck.
 - When multiple paper talks are merged, add a quick `Talk Overview` slide after the intro module by default so the audience knows what will happen in the combined talk.
 - Multiple-talk assembly defaults to long-form mode. Preserve the main and supporting content of each source talk unless the user explicitly asks for a shorter merged deck.

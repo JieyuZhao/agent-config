@@ -1,4 +1,4 @@
 interface:
   display_name: "Profile Intro Slides"
-  short_description: "Generate a reusable Yue Zhao / FORTIS intro insert"
-  default_prompt: "Use $profile-intro-slides to generate a reusable 2-3 slide Yue Zhao / FORTIS identity, agenda, and systems insert from the local website sources."
+  short_description: "Generate a reusable Jieyu Zhao / LIME intro insert"
+  default_prompt: "Use $profile-intro-slides to generate a reusable 2-3 slide Jieyu Zhao / LIME identity, agenda, and systems insert from the local website sources."

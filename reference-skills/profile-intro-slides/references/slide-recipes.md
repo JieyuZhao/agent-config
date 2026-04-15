@@ -4,7 +4,7 @@ These recipes are for a reusable intro insert, not a full talk opening. Preserve
 
 ## Canonical 3-Slide Family
 
-### 1. About Yue Zhao
+### 1. About Jieyu Zhao
 
 Role:
 
@@ -20,7 +20,7 @@ Primary object:
 
 Goal:
 
-- establish who Yue Zhao is and what the research program is about in one glance
+- establish who Jieyu Zhao is and what the research program is about in one glance
 
 Allowed content:
 
@@ -55,7 +55,7 @@ Avoid:
 - long award or service lists
 - time-sensitive recruiting or policy notes
 
-### 2. FORTIS Lab Research Agenda
+### 2. LIME Lab Research Agenda
 
 Role:
 
@@ -71,7 +71,7 @@ Primary object:
 
 Goal:
 
-- show the stable FORTIS Lab agenda in one glance
+- show the stable LIME Lab agenda in one glance
 
 Required structure:
 
@@ -189,17 +189,17 @@ Do not make every variant a full rewrite. Preserve the stable role split and adj
 
 ## Output Convention
 
-`templates/modules/yzhao-intro-slides.tex` should contain frame blocks only, for example:
+`templates/modules/jzhao-intro-slides.tex` should contain frame blocks only, for example:
 
 ```tex
-% About Yue Zhao
+% About Jieyu Zhao
 \begin{frame}[t]
-  \frametitle{About Yue Zhao}
+  \frametitle{About Jieyu Zhao}
   ...
 \end{frame}
 ```
 
-`templates/modules/yzhao-intro-facts.md` should record:
+`templates/modules/jzhao-intro-facts.md` should record:
 
 - the chosen slide family
 - the preferred project set

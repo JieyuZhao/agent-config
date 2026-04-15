@@ -98,7 +98,7 @@ Read the smallest set of inputs that will support drafting:
 - PI core materials under `template/context/team/` (auto-synced from
   external sources). These contain canonical raw assets such as
   `cv-full.tex`, `publications.json`, `open-source.json`, `bio.txt`, and
-  `yue-zhao.bib` that are shared across all proposals. When a proposal-level
+  `jieyu-zhao.bib` that are shared across all proposals. When a proposal-level
   `context/team/<person>/profile.md` exists, treat it as the
   proposal-specific overlay (Project Role, Writing Notes, Prior
   Collaboration) and merge it with the template-level general profile and
@@ -319,7 +319,7 @@ For team-qualification work, use this sub-workflow:
 1. read `template/context/team/<person>/profile.md` for general facts
    (role, education, grants, publications, open-source impact, lab) and
    raw assets (`cv-full.tex`, `publications.json`, `open-source.json`,
-   `bio.txt`, `yue-zhao.bib`) when available
+   `bio.txt`, `jieyu-zhao.bib`) when available
 2. read `<proposal-dir>/context/team/<person>/profile.md` for
    proposal-specific context (Project Role, Writing Notes, Prior
    Collaboration with this team)

@@ -22,8 +22,8 @@ It should not feel like:
 
 Default slide family:
 
-- `About Yue Zhao`
-- `FORTIS Lab Research Agenda`
+- `About Jieyu Zhao`
+- `LIME Lab Research Agenda`
 - `Representative Systems and Impact`
 
 Required role split:
@@ -70,14 +70,14 @@ Fail the preview if any slide violates these checks:
 - a systems slide with more than `4` representative projects
 - a systems slide that mixes project cards, a long takeaway paragraph, and a dense metrics strip
 - a systems slide where sponsor logos become as visually strong as the project cards or stronger than the metrics strip
-- any volatile number without a dated source in `yzhao-intro-facts.md`
+- any volatile number without a dated source in `jzhao-intro-facts.md`
 - slide text that depends on presenter notes or surrounding deck context
 
 ## Metrics Checks
 
 If including stars, downloads, scans, vulnerability counts, or similar signals:
 
-- record the exact source and date in `yzhao-intro-facts.md`
+- record the exact source and date in `jzhao-intro-facts.md`
 - put metrics only on the systems slide
 - keep them visually secondary to the project cards
 - add an explicit visible date only when the slide text needs it for interpretation
@@ -90,7 +90,7 @@ If including sponsor or research-support logos:
 - keep them only on the systems slide unless the user explicitly asks otherwise
 - keep the strip visually quieter than the metrics strip
 - cap the row to a small selected set rather than a logo wall
-- record the chosen assets and rationale in `yzhao-intro-facts.md`
+- record the chosen assets and rationale in `jzhao-intro-facts.md`
 - remove the sponsor strip before removing the metrics strip if Slide 3 starts to feel crowded
 
 ## Safe Slide Surgery

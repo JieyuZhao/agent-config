@@ -1,6 +1,6 @@
 ---
 name: profile-intro-slides
-description: Generate a reusable 2-3 slide Yue Zhao / FORTIS Lab intro insert from local website-first sources in this repo. Use when the user wants a stable identity, agenda, and representative-systems module that can be merged into other decks. Do not use this skill for full paper talks, mini-CV decks, or automatic deck insertion.
+description: Generate a reusable 2-3 slide Jieyu Zhao / LIME Lab intro insert from local website-first sources in this repo. Use when the user wants a stable identity, agenda, and representative-systems module that can be merged into other decks. Do not use this skill for full paper talks, mini-CV decks, or automatic deck insertion.
 ---
 
 # Profile Intro Slides
@@ -9,7 +9,7 @@ Read [references/source-selection.md](./references/source-selection.md) first.
 Read [references/slide-recipes.md](./references/slide-recipes.md) before writing any frames.
 Read [references/quality-checks.md](./references/quality-checks.md) before finalizing any draft.
 
-This skill generates a small reusable slide family about Yue Zhao and FORTIS Lab. It is for a stable intro insert, not for a full opening sequence, not for a recruiting deck, not for a mini CV, and not for inserting slides into another talk automatically.
+This skill generates a small reusable slide family about Jieyu Zhao and LIME Lab. It is for a stable intro insert, not for a full opening sequence, not for a recruiting deck, not for a mini CV, and not for inserting slides into another talk automatically.
 
 ## Workspace Contract
 
@@ -36,7 +36,7 @@ Useful optional sources:
 
 - `jyzhao.net/data/lab-current-phd.json`
 - `jyzhao.net/data/lab-members.json`
-- `jyzhao.net/files/ZHAO_YUE_CV.pdf`
+- `jyzhao.net/files/ZHAO_JIEYU_CV.pdf`
 - `jyzhao.net/images/rsz_250.jpg`
 - `jyzhao.net/images/lab-logo.png`
 
@@ -46,12 +46,12 @@ If the contract is not satisfied, stop and ask the user instead of improvising a
 
 Generate these artifacts by default:
 
-- `templates/modules/yzhao-intro-slides.tex`
-- `templates/modules/yzhao-intro-facts.md`
+- `templates/modules/jzhao-intro-slides.tex`
+- `templates/modules/jzhao-intro-facts.md`
 
-`yzhao-intro-slides.tex` should contain reusable frame blocks only. Do not include a document preamble, title page, section pages, bibliography appendix, or `\input{...}` edits to another deck.
+`jzhao-intro-slides.tex` should contain reusable frame blocks only. Do not include a document preamble, title page, section pages, bibliography appendix, or `\input{...}` edits to another deck.
 
-`yzhao-intro-facts.md` should be the canonical fact sheet that records the stable positioning, representative systems, chosen impact signals, and the source file for each nontrivial claim or number.
+`jzhao-intro-facts.md` should be the canonical fact sheet that records the stable positioning, representative systems, chosen impact signals, and the source file for each nontrivial claim or number.
 
 Only create a standalone preview deck or compile output if the user explicitly asks for a preview.
 
@@ -60,9 +60,9 @@ Only create a standalone preview deck or compile output if the user explicitly a
 1. Verify the workspace contract and read the source-selection reference.
 2. Extract stable facts from website-first sources. Use the CV only to fill gaps such as awards, service, or older chronology.
 3. Separate evergreen content from volatile content. Unless the user asks otherwise, omit recruiting details, news, collaboration logistics, live policy notices, and other time-sensitive site blocks.
-4. Build or refresh `templates/modules/yzhao-intro-facts.md` first. Record:
+4. Build or refresh `templates/modules/jzhao-intro-facts.md` first. Record:
    - identity and affiliation
-   - one-line FORTIS expansion and mission
+   - one-line LIME expansion and mission
    - the three main research directions
    - 3-5 representative systems, projects, or agenda-anchor papers
    - a small set of durable impact signals
@@ -70,17 +70,17 @@ Only create a standalone preview deck or compile output if the user explicitly a
    - the preferred portrait and lab logo assets
    - source path for each nontrivial claim or number
 5. Choose the slide family. Default to exactly three slides with fixed role separation:
-   - `About Yue Zhao`
-   - `FORTIS Lab Research Agenda`
+   - `About Jieyu Zhao`
+   - `LIME Lab Research Agenda`
    - `Representative Systems and Impact`
 6. Before drafting, assign each slide:
    - exactly one role
    - exactly one dominant mode: `text-first`, `visual-first`, or `compact card grid`
    - exactly one primary object of attention
-7. Write `templates/modules/yzhao-intro-slides.tex` as reusable frame blocks only.
+7. Write `templates/modules/jzhao-intro-slides.tex` as reusable frame blocks only.
    - Keep the canonical role split:
-     - `About Yue Zhao`: identity and positioning
-     - `FORTIS Lab Research Agenda`: agenda map
+     - `About Jieyu Zhao`: identity and positioning
+     - `LIME Lab Research Agenda`: agenda map
      - `Representative Systems and Impact`: execution evidence
    - Do not let one slide do two or three jobs at once.
 8. Run the checks in `references/quality-checks.md` before preview generation or handoff.
@@ -101,7 +101,7 @@ Only create a standalone preview deck or compile output if the user explicitly a
 - Prefer not to put paper-count, download, or GitHub-star callouts on the personal identity slide unless the user explicitly asks for a metrics-forward version.
 - Prefer one memorable phrase and three strong pillars over long bullet lists.
 - Prefer `3-4` representative systems on a systems slide. Do not try to summarize every project.
-- On the `FORTIS Lab Research Agenda` slide, prefer mixed examples under each pillar: named systems when tooling is the clearest anchor, and representative papers when they better communicate the current research direction.
+- On the `LIME Lab Research Agenda` slide, prefer mixed examples under each pillar: named systems when tooling is the clearest anchor, and representative papers when they better communicate the current research direction.
 - When a systems slide is likely to be shared as PDF, prefer clickable project names or project-title links that can route viewers to the corresponding site or repo.
 - For open-source projects, default those links to the GitHub repository itself unless the user explicitly prefers docs or a project site.
 - If project names are clickable, prefer subtle visible styling such as underlining rather than noisy explicit `[link]` labels.
@@ -118,6 +118,6 @@ Only create a standalone preview deck or compile output if the user explicitly a
 - Treat volatile metrics as optional, dated, and visually subordinate. If they add clutter, remove them.
 - Avoid full publication lists, full awards lists, full student rosters, or sponsor walls unless the user asks for them.
 - Keep visible slide text concise, broad-CS readable, and slide-native rather than webpage-like.
-- If you include numbers that can drift, record the exact source and date in `yzhao-intro-facts.md`. Use an absolute date in visible text only when the date matters for interpretation.
+- If you include numbers that can drift, record the exact source and date in `jzhao-intro-facts.md`. Use an absolute date in visible text only when the date matters for interpretation.
 - Preserve USC styling by generating content-only frame blocks. If a preview deck is requested, inherit styling from `templates/paper-deck-base.tex` or `templates/demo.tex` instead of editing `theme/*.sty`.
 - This skill generates reusable intro modules only. It does not insert them into existing decks, update presenter maps, or reorganize another talk around them.

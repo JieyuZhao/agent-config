@@ -624,7 +624,7 @@ mkdir -p ~/projects/spark-sandbox
 cd ~/projects/spark-sandbox
 git init -q
 mkdir -p .agent-config .claude/commands
-curl -sfL https://raw.githubusercontent.com/yzhao062/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh
+curl -sfL https://raw.githubusercontent.com/JieyuZhao/agent-config/main/bootstrap/bootstrap.sh -o .agent-config/bootstrap.sh
 bash .agent-config/bootstrap.sh
 claude
 ```

@@ -1,6 +1,6 @@
 # Source Selection
 
-Use website-first sources by default. This skill is meant to preserve the current public positioning of Yue Zhao and FORTIS Lab, not to reconstruct an exhaustive CV narrative.
+Use website-first sources by default. This skill is meant to preserve the current public positioning of Jieyu Zhao and LIME Lab, not to reconstruct an exhaustive CV narrative.
 
 ## Primary Sources
 
@@ -9,7 +9,7 @@ Use website-first sources by default. This skill is meant to preserve the curren
 - `jyzhao.net/index.html`
   - Best source for the current research summary and the three main research directions.
 - `jyzhao.net/lab.html`
-  - Best source for the FORTIS expansion, mission statement, and lab-level framing.
+  - Best source for the LIME expansion, mission statement, and lab-level framing.
 - `jyzhao.net/data/open-source.json`
   - Best source for representative systems, project roles, and project-level impact signals.
 - `jyzhao.net/data/publications.json`
@@ -21,7 +21,7 @@ Use website-first sources by default. This skill is meant to preserve the curren
   - Use when a slide needs limited evidence of lab scope or trainee profile.
 - `jyzhao.net/data/lab-members.json`
   - Use sparingly for lab breadth, student outcomes, or mentorship evidence.
-- `jyzhao.net/files/ZHAO_YUE_CV.pdf`
+- `jyzhao.net/files/ZHAO_JIEYU_CV.pdf`
   - Use only to fill gaps such as awards, service, or older history.
 - `jyzhao.net/images/rsz_250.jpg`
   - Preferred portrait unless the user asks for a different image.
@@ -48,7 +48,7 @@ These blocks are useful for the website, but they stale too quickly for reusable
 Safe default content:
 
 - current title and affiliation
-- FORTIS expansion and mission
+- LIME expansion and mission
 - three research directions
 - representative systems and projects
 - a small number of durable impact signals
@@ -83,4 +83,4 @@ When sources disagree:
 1. Prefer the more recent website wording for current positioning.
 2. Prefer structured data files for project lists and project metrics.
 3. Use the CV only when the website lacks the needed fact.
-4. If the conflict remains unresolved, note it in `yzhao-intro-facts.md` instead of guessing.
+4. If the conflict remains unresolved, note it in `jzhao-intro-facts.md` instead of guessing.

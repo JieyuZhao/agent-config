@@ -27,7 +27,7 @@ The primary use case is intent-to-form support: the user tells Codex what they w
    - Read `references/policy-gaps.md` when USC-specific rules are still unknown or disputed.
    - Read `references/knowledge-ingestion.md` when new USC policy files or spreadsheets are added to the repo.
    - Read `../../knowledge/usc-reimbursement/normalized/common-knowledge.md` when the task depends on existing USC workflow knowledge already extracted from source files.
-   - Read `../../knowledge/usc-reimbursement/normalized/account-reference-yue-zhao.md` when choosing or validating funding sources for Yue Zhao accounts.
+   - Read `../../knowledge/usc-reimbursement/normalized/account-reference-jieyu-zhao.md` when choosing or validating funding sources for Jieyu Zhao accounts.
    - Read `../../knowledge/usc-reimbursement/normalized/amazon-fellowship-rules.md` when an expense may charge `GF1028771` or another Amazon fellowship-linked account.
    - Read `../../knowledge/usc-reimbursement/normalized/form-field-map.md` when drafting or checking USC form inputs.
    - Read `../../knowledge/usc-reimbursement/normalized/policy-rules-from-forms.md` when checking deadlines, pre-approval triggers, or discretionary spending constraints.
@@ -140,7 +140,7 @@ Update `timeline.md` whenever the case changes state. Preserve:
 - `references/policy-gaps.md`: USC-specific rules that still need to be confirmed
 - `references/knowledge-ingestion.md`: how to store and normalize USC source documents in this repo
 - `../../knowledge/usc-reimbursement/normalized/common-knowledge.md`: normalized USC process knowledge extracted from local source files
-- `../../knowledge/usc-reimbursement/normalized/account-reference-yue-zhao.md`: extracted funding and balance reference for Yue Zhao accounts
+- `../../knowledge/usc-reimbursement/normalized/account-reference-jieyu-zhao.md`: extracted funding and balance reference for Jieyu Zhao accounts
 - `../../knowledge/usc-reimbursement/normalized/amazon-fellowship-rules.md`: fellowship-specific restrictions for Amazon ML Fellowship funding
 - `../../knowledge/usc-reimbursement/normalized/form-field-map.md`: normalized form schemas for USC order, reimbursement, and spending-approval forms
 - `../../knowledge/usc-reimbursement/normalized/policy-rules-from-forms.md`: deadlines, approval triggers, and FAQ-derived operating rules

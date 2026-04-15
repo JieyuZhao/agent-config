@@ -8,7 +8,7 @@ Use these patterns to keep the merged talk coherent without over-editing the sou
 
 - master title
 - optional short roadmap
-- `1-3` intro slides from `templates/modules/yzhao-intro-slides.tex`
+- `1-3` intro slides from `templates/modules/jzhao-intro-slides.tex`
 - one bridge slide: why this paper belongs in the talk
 - one paper segment
 - one short closing or synthesis slide only if needed
