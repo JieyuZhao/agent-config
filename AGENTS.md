@@ -191,6 +191,8 @@ To bump the pinned version, edit the `v0.3.1` tag in `bootstrap/bootstrap.sh` an
 - **Never run `git commit` or `git push` without explicit user approval.** Always show the proposed action and ask for confirmation before executing.
 - This rule is non-negotiable and applies to all projects that consume this shared config.
 - This includes any variant: `git commit -m`, `git commit --amend`, `git push`, `git push --force`, `gh pr create` (which pushes), etc.
+- **Before every `git commit`, verify the staging area matches the commit message.** Run `git status`, read the full "Changes to be committed" block, and confirm it contains only the files the message describes. `git add <files>` appends to the index -- prior-staged files (from `git mv`, earlier work, etc.) are swept in silently otherwise.
+- To scope a commit to specific paths regardless of what else is staged, use `git commit -- <file1> <file2>` (pathspec). This commits only those paths and is safer than trusting the staging state.
 
 ## Shell Command Style
 
