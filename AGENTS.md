@@ -148,6 +148,19 @@ After the session-start checks, inspect the project for known types and run one-
   - `C:\WINDOWS\System32\WindowsPowerShell\v1.0\powershell.exe` (process, if Codex invokes PowerShell)
 - **Windows recommendation: use the terminal path.** On Windows (11 Build 26200+), the MCP path still has rough edges — residual approval prompts and Bitdefender false positives add friction even after the mitigations above. The terminal path (relay reviews via the Codex interactive terminal window) avoids both issues. Prefer the terminal path on Windows; use MCP on macOS/Linux where it works smoothly.
 
+## Writing Ruleset (agent-style)
+
+The full 21-rule writing ruleset from [`yzhao062/agent-style`](https://github.com/yzhao062/agent-style) is fetched by bootstrap to `.agent-style/RULES.md` (pinned at `v0.3.1`). Two groups:
+
+- **RULE-01..12 (canonical):** Strunk & White, Orwell, Pinker, and Gopen & Swan -- curse of knowledge, passive voice, concrete vs abstract language, needless words, dying metaphors, plain English over jargon, affirmative form, claim calibration, parallel structure, keeping related words together, stress position, and sentence length.
+- **RULE-A..I (field-observed LLM tells):** Bullet-point overuse, em/en dashes as casual punctuation, consecutive same-start sentences, transition-word overuse, paragraph-closing summaries, inconsistent terms / abbreviation redefinition, sentence-case section headings, **handwavy claims and fabricated citations (critical)**, and contractions in formal technical prose.
+
+Claude Code loads the full rule bodies via `@.agent-style/RULES.md`. Other agents should `Read` the file at session start. The `Writing Defaults` and `Formatting Defaults` sections below are project-specific anchors (scientific register, DEI stance, BibTeX, banned AI-tell words) that complement -- not duplicate -- the agent-style ruleset.
+
+To bump the pinned version, edit the `v0.3.1` tag in `bootstrap/bootstrap.sh` and `bootstrap/bootstrap.ps1`.
+
+@.agent-style/RULES.md
+
 ## Writing Defaults
 
 - Use scientifically accessible language.

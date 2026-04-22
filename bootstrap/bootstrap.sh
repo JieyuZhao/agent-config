@@ -1,9 +1,10 @@
 # Let .gitattributes handle line endings; silence CRLF warnings on Windows
 git config --global core.autocrlf false
 
-mkdir -p .agent-config .claude/commands
+mkdir -p .agent-config .claude/commands .agent-style
 curl -sfL https://raw.githubusercontent.com/JieyuZhao/agent-config/main/AGENTS.md -o .agent-config/AGENTS.md
 cp -f .agent-config/AGENTS.md AGENTS.md
+curl -sfL https://raw.githubusercontent.com/yzhao062/agent-style/v0.3.1/RULES.md -o .agent-style/RULES.md
 if [ -d .agent-config/repo/.git ]; then
   git -C .agent-config/repo pull --ff-only
 else
@@ -66,4 +67,7 @@ P.Path(P.Path.home()/'.claude'/'settings.json').write_text(json.dumps(u,indent=2
 fi
 if [ ! -f .gitignore ] || ! grep -qE '^\/?\.agent-config/' .gitignore; then
   echo '.agent-config/' >> .gitignore
+fi
+if [ ! -f .gitignore ] || ! grep -qE '^\/?\.agent-style/' .gitignore; then
+  echo '.agent-style/' >> .gitignore
 fi

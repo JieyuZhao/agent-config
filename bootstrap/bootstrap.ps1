@@ -22,9 +22,10 @@ function Merge-Json($base, $over) {
     }
   }
 }
-New-Item -ItemType Directory -Force -Path .agent-config, .claude, .claude/commands | Out-Null
+New-Item -ItemType Directory -Force -Path .agent-config, .claude, .claude/commands, .agent-style | Out-Null
 Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/JieyuZhao/agent-config/main/AGENTS.md -OutFile .agent-config/AGENTS.md
 Copy-Item .agent-config/AGENTS.md AGENTS.md -Force
+Invoke-WebRequest -UseBasicParsing -Uri https://raw.githubusercontent.com/yzhao062/agent-style/v0.3.1/RULES.md -OutFile .agent-style/RULES.md
 if (Test-Path .agent-config/repo/.git) {
   git -C .agent-config/repo pull --ff-only
 } else {
@@ -68,4 +69,7 @@ if (Test-Path .agent-config/repo/user/settings.json) {
 }
 if (-not (Test-Path .gitignore) -or -not (Select-String -Quiet -Pattern '^\/?\.agent-config/' .gitignore)) {
   Add-Content -Path .gitignore -Value "`n.agent-config/"
+}
+if (-not (Test-Path .gitignore) -or -not (Select-String -Quiet -Pattern '^\/?\.agent-style/' .gitignore)) {
+  Add-Content -Path .gitignore -Value "`n.agent-style/"
 }
