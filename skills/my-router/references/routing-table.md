@@ -25,7 +25,7 @@
 | `nsf-thrust-refiner` | NSF thrust/aim polishing | Technical depth patterns, figure patterns, quality checklist |
 | `nsf-proposal-guardrail` | NSF compliance checking | Solicitation parsing, template mapping, output schema |
 | `nsf-figure-builder` | NSF-specific figures | Figure archetypes and tool selection for proposals |
-| `proposal-reviewer` | Proposal content review (any sponsor) | Intent fit, challenge clarity, differentiation, structural alignment, scoring |
+| `proposal-review` | Proposal content review (any sponsor) | Intent fit, challenge clarity, differentiation, structural alignment, scoring |
 
 ### Paper and Review
 

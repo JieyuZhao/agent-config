@@ -63,7 +63,7 @@ Reference skills are domain-specific and must be copied into a project's `skills
 | `nsf-thrust-refiner` | Deepen individual thrusts or aims with sharper gaps, literature grounding, and evaluation hooks. |
 | `nsf-proposal-guardrail` | Compliance checking: solicitation parsing, requirements baseline, preflight gap check. |
 | `nsf-figure-builder` | Figure archetypes and prompt design for NSF proposal figures. |
-| `proposal-reviewer` | Content quality review for any sponsor: intent fit, challenge clarity, differentiation, causal chain, scope, evidence posture. |
+| `proposal-review` | Content quality review for any sponsor: intent fit, challenge clarity, differentiation, causal chain, scope, evidence posture. |
 
 ### Paper Writing and Review
 

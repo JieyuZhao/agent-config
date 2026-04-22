@@ -1,5 +1,5 @@
 ---
-name: proposal-reviewer
+name: proposal-review
 description: Review a research proposal draft against a CFP or stated research intent. Use when Codex needs to check compliance, evaluate content quality, simulate reviewer scoring, or produce a priority-ordered list of revision targets. Works for NSF, NIH, DARPA, and industry proposals. Focuses substantive review on intent fit, challenge clarity, differentiation, causal chain, scope discipline, evidence posture, and structural alignment before copyediting.
 ---
 

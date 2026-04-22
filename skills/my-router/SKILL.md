@@ -47,7 +47,7 @@ The user's prompt often contains the clearest signal. Match keywords to skills:
 | "latex setup", "set up latex", "configure latex", "vscode latex", "latex workshop" | `latex-setup` | `skills/` (shared) |
 | "evolve this skill", "update this skill", "learn from this session", "summarize my feedback on X", "propose skill updates" | `skill-evolve` | `skills/` (shared) |
 | "proposal", "nsf", "nih", "grant", "solicitation", "aim", "thrust" | Proposal skills (check for local `nsf-*`, `nih-*` skills first) | `reference-skills/` (project-local) |
-| "review proposal", "review this draft", "score this proposal", "proposal feedback", "is the challenge clear", "differentiation" (in proposal context) | `proposal-reviewer` | `reference-skills/` (project-local) |
+| "review proposal", "review this draft", "score this proposal", "proposal feedback", "is the challenge clear", "differentiation" (in proposal context) | `proposal-review` | `reference-skills/` (project-local) |
 | "improve writing", "rewrite this", "polish", "make this clearer", "review this paragraph", "is this logical", "diagnose" (in paper context) | `paper-improve` | `reference-skills/` (project-local) |
 | "review paper", "peer review", "reviewer comments" | `cs-paper-review` | `reference-skills/` (project-local) |
 | "meta-review", "area chair", "AC decision" | `cs-meta-review` | `reference-skills/` (project-local) |

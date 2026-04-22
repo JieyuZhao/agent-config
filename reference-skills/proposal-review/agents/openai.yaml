@@ -1,4 +1,4 @@
 interface:
   display_name: "Proposal Reviewer"
   short_description: "Review a proposal draft for intent fit, challenge clarity, differentiation, and structural alignment"
-  default_prompt: "Use $proposal-reviewer to review the current proposal draft. Check compliance, run the substantive review (intent fit, challenge clarity, differentiation, causal chain, scope, evidence posture, structural alignment), simulate reviewer scoring, and return a priority-ordered list of revision targets."
+  default_prompt: "Use $proposal-review to review the current proposal draft. Check compliance, run the substantive review (intent fit, challenge clarity, differentiation, causal chain, scope, evidence posture, structural alignment), simulate reviewer scoring, and return a priority-ordered list of revision targets."
