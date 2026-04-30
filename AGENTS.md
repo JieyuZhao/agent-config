@@ -76,7 +76,7 @@ After bootstrap, run **all** of the following checks and report results in a sho
 1. **OS** -- Read the platform from the session environment (e.g., `win32`, `darwin`, `linux`). Note it for platform-specific behavior (e.g., terminal review path on Windows, MCP on macOS/Linux).
 2. **Claude Code model and effort** (Claude Code sessions only) -- If the live session environment exposes model name and effort level, check them. The user prefers the highest available model (currently Opus) at max effort. If the session is on a different model or effort, mention it once — this is a preference, not a misconfiguration.
 3. **Codex config** -- Read `~/.codex/config.toml` (or `%USERPROFILE%\.codex\config.toml` on Windows). If the file exists, check these keys and report any that are missing or wrong:
-   - `model` should be `"gpt-5.4"` (or the latest available)
+   - `model` should be `"gpt-5.5"` (or the latest available)
    - `model_reasoning_effort` should be `"xhigh"`
    - `service_tier` should be `"fast"`
    - `[features] fast_mode` should be `true`
@@ -125,7 +125,7 @@ After the session-start checks, inspect the project for known types and run one-
 - Prerequisites: Node.js installed, Codex CLI installed (`npm install -g @openai/codex`), and `OPENAI_API_KEY` set.
 - **Recommended Codex defaults (as of April 2026):** Add or update these keys in `~/.codex/config.toml` on macOS/Linux or `%USERPROFILE%\.codex\config.toml` on Windows (create the file if it does not exist) so that both interactive sessions and the MCP server use the recommended default model with fast inference:
   ```toml
-  model = "gpt-5.4"
+  model = "gpt-5.5"
   model_reasoning_effort = "xhigh"
   service_tier = "fast"
 

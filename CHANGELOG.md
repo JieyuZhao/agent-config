@@ -4,6 +4,14 @@ All notable changes to the shared agent configuration are documented here.
 Consuming projects pull the latest on every bootstrap run; this log helps
 track what changed between runs.
 
+## 2026-04-28
+
+### Added
+- `research-proposal-style` shared skill: funder-agnostic voice layer for proposals (Amazon ARA, NSF, NIH, foundations). Five-beat opening, rejected-opening list, sentence-level moves, reinforcement-vs-repetition rule, concrete numerical evaluation targets. Cross-referenced from `nsf-proposal-composer` and `proposal-review`; routed by `my-router`.
+
+### Changed
+- Recommended Codex model bumped from `gpt-5.4` to `gpt-5.5` (Session Start Check and `~/.codex/config.toml` block in `AGENTS.md`).
+
 ## 2026-04-11
 
 ### Changed
