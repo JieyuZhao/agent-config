@@ -85,3 +85,12 @@ Before using the intro as the source of truth for aim generation, verify:
 ```text
 使用 $nsf-proposal-composer，检查当前 intro 的 gap-to-thrust mapping 是否顺；如果不顺，先重组框架再刷新 aims
 ```
+
+## See Also
+
+For voice-layer guidance that complements this composer-level architecture, see
+`skills/research-proposal-style/SKILL.md`. That skill is funder-agnostic and adds
+two beats not covered here — `why now` (convergence of conditions) and a `vision`
+closing — plus rules on sharp thesis phrasing, hedge audit, and reinforcement vs.
+verbatim repetition. The composer decides what each layer says; the style skill
+decides how each layer is written.

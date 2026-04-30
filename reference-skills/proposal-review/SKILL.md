@@ -97,6 +97,13 @@ hypotheses are stated as established facts. Flag sentences that use strong
 positive language ("will show", "will prove") without corresponding evidence
 commitments.
 
+For the inverse failure — hedged language ("we may propose", "this might
+enable", "we believe this could") that erodes conviction — see
+`skills/research-proposal-style/SKILL.md`. That skill also defines the
+sharp-thesis test, the reinforcement-vs-repetition rule, and the rejected-opening
+patterns (vignettes, statistics-as-drama). Use it as the positive prescription
+when this review surfaces voice problems.
+
 #### 3.5 Causal Chain
 
 For theory-heavy or mechanism-heavy proposals, verify that the document clearly

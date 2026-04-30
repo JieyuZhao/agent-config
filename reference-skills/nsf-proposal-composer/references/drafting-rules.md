@@ -69,3 +69,12 @@ After drafting each section, annotate it with one of:
 
 These annotations are for the author's review pass, not for the final
 submission. Remove them before submitting.
+
+## See Also
+
+For sentence-level moves and voice rules — sharp thesis phrasing, the "to our
+knowledge" pattern, the "lesson from prior work" reframe, hedge audit, and the
+reinforcement-vs-repetition rule — see `skills/research-proposal-style/SKILL.md`.
+The drafting rules in this file cover argument *structure* (challenge,
+differentiation, motivation); the style skill covers how the prose around those
+arguments actually sounds.
